@@ -1,0 +1,56 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="fashion-ecommerce:war exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/fashion_ecommerce_war_exploded</output-path>
+    <root id="root">
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/webapp/index.jsp" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/webapp/chatbot-test.jsp" />
+      <element id="directory" name="common">
+        <element id="dir-copy" path="$PROJECT_DIR$/src/main/webapp/common" />
+      </element>
+      <element id="directory" name="decorators">
+        <element id="dir-copy" path="$PROJECT_DIR$/src/main/webapp/decorators" />
+      </element>
+      <element id="directory" name="templates">
+        <element id="dir-copy" path="$PROJECT_DIR$/src/main/webapp/templates" />
+      </element>
+      <element id="directory" name="views">
+        <element id="dir-copy" path="$PROJECT_DIR$/src/main/webapp/views" />
+      </element>
+      <element id="directory" name="WEB-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" />
+        <element id="file-copy" path="$PROJECT_DIR$/src/main/webapp/WEB-INF/decorators.xml" />
+        <element id="directory" name="classes">
+          <element id="module-output" name="jsp-servlet" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.15.2" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-core:2.15.2" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.15.2" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.18.1" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.1" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.module:jackson-module-kotlin:2.18.1" />
+          <element id="library" level="project" name="Maven: com.google.errorprone:error_prone_annotations:2.33.0" />
+          <element id="library" level="project" name="Maven: com.google.protobuf:protobuf-java:3.11.4" />
+          <element id="library" level="project" name="Maven: com.mchange:c3p0:0.9.5.5" />
+          <element id="library" level="project" name="Maven: com.mchange:mchange-commons-java:0.2.19" />
+          <element id="library" level="project" name="Maven: com.openai:openai-java-client-okhttp:0.9.0" />
+          <element id="library" level="project" name="Maven: com.openai:openai-java-core:0.9.0" />
+          <element id="library" level="project" name="Maven: com.openai:openai-java:0.9.0" />
+          <element id="library" level="project" name="Maven: com.squareup.okhttp3:logging-interceptor:4.12.0" />
+          <element id="library" level="project" name="Maven: com.squareup.okhttp3:okhttp:4.11.0" />
+          <element id="library" level="project" name="Maven: com.squareup.okio:okio-jvm:3.2.0" />
+          <element id="library" level="project" name="Maven: com.squareup.okio:okio:3.2.0" />
+          <element id="library" level="project" name="Maven: io.github.cdimascio:dotenv-java:3.0.0" />
+          <element id="library" level="project" name="Maven: javax.servlet:jstl:1.2" />
+          <element id="library" level="project" name="Maven: mysql:mysql-connector-java:8.0.28" />
+          <element id="library" level="project" name="Maven: opensymphony:sitemesh:2.4.2" />
+          <element id="library" level="project" name="Maven: commons-fileupload:commons-fileupload:1.5" />
+          <element id="library" level="project" name="Maven: commons-io:commons-io:2.16.1" />
+          <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-reflect:1.8.10" />
+          <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.9.23" />
+          <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.36" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>

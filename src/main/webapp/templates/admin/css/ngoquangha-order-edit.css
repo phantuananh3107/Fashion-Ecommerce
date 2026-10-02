@@ -1,0 +1,304 @@
+a {
+  text-decoration: none;
+}
+
+input, select, textarea {
+  outline: none;
+}
+
+/* Box title */
+.box-title {
+  margin: 0 0 30px;
+  font-weight: 700;
+  font-size: 32px;
+  color: var(--color-text);
+}
+
+/* End Box title */
+
+/* Section 8 */
+.section-8 {
+  background-color: #fff;
+  border: 1px solid #B9B9B9;
+  border-radius: 14px;
+  padding: 50px;
+}
+
+.section-8 form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+}
+
+.section-8 .inner-label {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  color: #606060;
+  margin-bottom: 11px;
+}
+
+.section-8 .inner-two-col {
+  grid-column: span 2;
+}
+
+.section-8 .inner-group input,
+.section-8 .inner-group select,
+.section-8 .inner-group textarea {
+  background-color: #F5F6FA;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--color-text);
+  width: 100%;
+  border: 1px solid #D5D5D5;
+  padding: 0 22px;
+}
+
+.section-8 .inner-group input,
+.section-8 .inner-group select {
+  height: 52px;
+}
+
+.section-8 .inner-group textarea {
+  height: 160px;
+  padding: 18px 22px;
+  resize: none;
+}
+
+.section-8 .inner-button {
+  text-align: center;
+}
+
+.section-8 .inner-button button {
+  background-color: #4880FF;
+  opacity: 0.9;
+  color: #fff;
+  font-weight: 700;
+  font-size: 18px;
+  height: 56px;
+  border-radius: 12px;
+  border: 0;
+  width: 274px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.section-8 .inner-button button:hover {
+  opacity: 1;
+}
+
+.section-8 .inner-back {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.section-8 .inner-back a {
+  font-weight: 700;
+  font-size: 18px;
+  color: #4880FF;
+  text-decoration: underline;
+}
+
+.section-8 form .inner-input-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.section-8 form .inner-input-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+} 
+
+.section-8 form .inner-input-item label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #606060;
+  width: 89px;
+}
+
+.section-8 form .inner-input-item input {
+  flex: 1;
+}
+
+.section-8 form .inner-checkbox-list {
+  border: 1px solid #D5D5D5;
+  background-color: #F5F6FA;
+  border-radius: 4px;
+  height: 166px;
+  overflow-y: auto;
+  padding: 14px 23px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section-8 form .inner-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.section-8 form .inner-checkbox-item .inner-locations {
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.section-8 form .inner-schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.section-8 form .inner-schedule-item {
+  border: 1px solid #D5D5D5;
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 15px;
+}
+
+.section-8 form .inner-schedule-head {
+  display: flex;
+  gap: 15px;
+}
+
+.section-8 form .inner-schedule-head input {
+  flex: 1;
+}
+
+.section-8 form .inner-schedule-button {
+  width: 52px;
+  height: 52px;
+  border: 1px solid #D5D5D5;
+  border-radius: 4px;
+  background-color: #F5F6FA;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #A6A6A6;
+}
+
+.section-8 form .inner-schedule-button.inner-move {
+  cursor: move;
+}
+
+.section-8 form .inner-schedule-button.inner-remove {
+  color: #EF3826;
+  cursor: pointer;
+}
+
+.section-8 form .inner-schedule-button.inner-more {
+  cursor: pointer;
+}
+
+.section-8 form .inner-schedule-body {
+  margin-top: 15px;
+}
+
+.section-8 form .inner-schedule-body textarea {
+  height: 300px;
+}
+
+.section-8 form .inner-schedule-create {
+  background-color: #D5D5D5;
+  border-radius: 4px;
+  opacity: 0.9;
+  font-weight: 700;
+  font-size: 14px;
+  display: inline-flex;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.section-8 form .inner-schedule-create:hover {  
+  opacity: 1;
+}
+
+.section-8 form .inner-order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.section-8 form .inner-order-item {
+  display: flex;
+  gap: 12px;
+}
+
+.section-8 form .inner-order-image {
+  width: 115px;
+  height: 115px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.section-8 form .inner-order-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.section-8 form .inner-order-content {
+  flex: 1;
+}
+
+.section-8 form .inner-order-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.section-8 form .inner-order-text {
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--color-text);
+  margin-top: 3px;
+}
+
+.section-8 form .inner-order-total {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-text);
+  margin-top: 11px;
+}
+
+.section-8 form .inner-order-price {
+  color: #EF3826;
+  font-weight: 700;
+}
+
+.section-8 .message {
+  margin-top: 4px;
+  font-size: 14px;
+  color: #EF3826;
+}
+
+@media (max-width: 767.98px) {
+  .section-8 {
+    padding: 20px;
+  }
+
+  .section-8 form {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .section-8 .inner-two-col {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .section-8 form .inner-schedule-head {
+    flex-wrap: wrap;
+  }
+
+  .section-8 form .inner-schedule-head input {
+    flex: none;
+    width: 100%;
+    order: 1;
+  }
+}

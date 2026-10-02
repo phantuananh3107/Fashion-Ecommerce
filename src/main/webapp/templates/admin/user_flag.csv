@@ -1,0 +1,26 @@
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+
+# Dữ liệu mẫu
+data = {
+    "user_id": [1, 2, 3, 4, 5],
+    "login_count": [5, 1, 5, 2, 50],  # login_count
+    "is_suspicious": [0, 1, 0, 1, 1]  # gán thủ công để mô hình học
+}
+df = pd.DataFrame(data)
+
+# Huấn luyện mô hình đơn giản
+X = df[["login_count"]]
+y = df["is_suspicious"]
+model = RandomForestClassifier(n_estimators=10, random_state=42)
+model.fit(X, y)
+
+# Dữ liệu thật từ hệ thống của bạn
+real_users = pd.read_csv("users_from_db.csv")  # Cần xuất từ hệ thống Java
+X_real = real_users[["login_count"]]
+predictions = model.predict(X_real)
+real_users["flag"] = predictions
+
+# Ghi lại kết quả
+real_users[["user_id", "flag"]].to_csv("user_flags.csv", index=False)
+print("✅ AI predictions saved to user_flags.csv")

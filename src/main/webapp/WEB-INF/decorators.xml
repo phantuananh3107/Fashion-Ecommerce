@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<decorators defaultdir="/decorators">
+	
+    <!-- Decorator cho URL /admin/* -->
+    <decorator name="admin" page="admin.jsp">
+        <pattern>/admin*</pattern>
+    </decorator>
+
+    <!-- Decorator mặc định cho mọi trang khác -->
+    <decorator name="web" page="web.jsp">
+        <pattern>/*</pattern>
+    </decorator>
+    
+    <exclude>
+        <url-pattern>/api*</url-pattern>
+    </exclude>
+
+</decorators>
