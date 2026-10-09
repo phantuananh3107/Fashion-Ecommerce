@@ -33,6 +33,19 @@ public class ProductDetail extends HttpServlet {
                 int productId = Integer.parseInt(productIdStr);
                 // Lấy thông tin sản phẩm từ cơ sở dữ liệu
                 product = productDAO.getProductById(productId);
+
+                if (product != null) {
+                    model.UserObject user = (model.UserObject) request.getSession().getAttribute("user");
+                    Integer userId = (user != null) ? user.getUserId() : null;
+                    String sessionId = request.getSession().getId();
+
+                    String ref = request.getParameter("ref");
+                    if (ref != null && !ref.trim().isEmpty()) {
+                        service.BehaviorTracker.trackRecClick(userId, sessionId, productId, ref.trim());
+                    } else {
+                        service.BehaviorTracker.trackView(userId, sessionId, productId);
+                    }
+                }
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }

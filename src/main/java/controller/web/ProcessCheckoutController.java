@@ -111,6 +111,17 @@ public class ProcessCheckoutController extends HttpServlet {
         int orderId = orderDAO.insertOrder(order, cartList);
 
         if (orderId > 0) {
+            // Track PURCHASE behavior for each product in checkout order
+            String sessionId = session.getId();
+            Integer userId = (user != null) ? user.getUserId() : null;
+            if (cartList != null) {
+                for (CartObject item : cartList) {
+                    if (item != null && item.getProductObject() != null) {
+                        service.BehaviorTracker.trackPurchase(userId, sessionId, item.getProductObject().getProductId());
+                    }
+                }
+            }
+
             // ==========================================
             // CẬP NHẬT LẠI SỐ LƯỢNG VOUCHER
             // ==========================================
