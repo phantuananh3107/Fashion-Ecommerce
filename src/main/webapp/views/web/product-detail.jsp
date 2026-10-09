@@ -244,6 +244,64 @@
                 </div>
             </div>
         </c:if>
+
+        <!-- Recommendation Block: Khách Mua Sản Phẩm Này Cũng Mua -->
+        <c:if test="${not empty alsoBoughtProducts}">
+            <div class="product-recommendations mt-5 pt-4 border-top">
+                <h3 class="mb-4 font-weight-bold" style="font-size: 20px; text-transform: uppercase;">KHÁCH MUA SẢN PHẨM NÀY CŨNG MUA</h3>
+                <div class="row">
+                    <c:forEach var="rec" items="${alsoBoughtProducts}">
+                        <c:set var="p" value="${rec.product}"/>
+                        <div class="col-6 col-md-4 col-lg-2 mb-4">
+                            <div class="card h-100 border-0 shadow-sm rounded">
+                                <a href="<c:url value='/public/product-detail?id=${p.productId}&ref=${rec.source}'/>" class="position-relative text-decoration-none text-dark">
+                                    <c:if test="${p.discountPercent > 0}">
+                                        <span class="badge bg-danger position-absolute top-0 start-0 m-2">-${p.discountPercent}%</span>
+                                    </c:if>
+                                    <img src="<c:url value='${p.productImage}'/>" class="card-img-top" alt="${p.productName}" style="object-fit: cover; height: 180px;">
+                                    <div class="card-body p-2">
+                                        <div class="text-muted small mb-1">${rec.reason}</div>
+                                        <h6 class="card-title text-truncate mb-1" style="font-size: 14px;">${p.productName}</h6>
+                                        <div class="fw-bold text-danger" style="font-size: 14px;">
+                                            <fmt:formatNumber value="${p.discountPercent > 0 ? p.productPrice * (100 - p.discountPercent) / 100 : p.productPrice}" pattern="###,###"/>đ
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </c:forEach>
+                </div>
+            </div>
+        </c:if>
+
+        <!-- Recommendation Block: Sản Phẩm Tương Tự -->
+        <c:if test="${not empty similarProducts}">
+            <div class="product-recommendations mt-4 pt-3 border-top">
+                <h3 class="mb-4 font-weight-bold" style="font-size: 20px; text-transform: uppercase;">SẢN PHẨM TƯƠNG TỰ</h3>
+                <div class="row">
+                    <c:forEach var="rec" items="${similarProducts}">
+                        <c:set var="p" value="${rec.product}"/>
+                        <div class="col-6 col-md-4 col-lg-2 mb-4">
+                            <div class="card h-100 border-0 shadow-sm rounded">
+                                <a href="<c:url value='/public/product-detail?id=${p.productId}&ref=${rec.source}'/>" class="position-relative text-decoration-none text-dark">
+                                    <c:if test="${p.discountPercent > 0}">
+                                        <span class="badge bg-danger position-absolute top-0 start-0 m-2">-${p.discountPercent}%</span>
+                                    </c:if>
+                                    <img src="<c:url value='${p.productImage}'/>" class="card-img-top" alt="${p.productName}" style="object-fit: cover; height: 180px;">
+                                    <div class="card-body p-2">
+                                        <h6 class="card-title text-truncate mb-1" style="font-size: 14px;">${p.productName}</h6>
+                                        <div class="fw-bold text-danger" style="font-size: 14px;">
+                                            <fmt:formatNumber value="${p.discountPercent > 0 ? p.productPrice * (100 - p.discountPercent) / 100 : p.productPrice}" pattern="###,###"/>đ
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </c:forEach>
+                </div>
+            </div>
+        </c:if>
+
         <c:if test="${empty product}">
             <div class="inner-wrap text-center py-5">
                 <i class="fa-solid fa-box-open fa-4x text-secondary mb-3"></i>
