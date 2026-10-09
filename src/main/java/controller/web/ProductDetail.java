@@ -45,6 +45,13 @@ public class ProductDetail extends HttpServlet {
                     } else {
                         service.BehaviorTracker.trackView(userId, sessionId, productId);
                     }
+
+                    recommend.RecommendationService recService = new recommend.RecommendationService();
+                    java.util.List<recommend.RecommendedProduct> alsoBoughtProducts = recService.alsoBought(productId, 6);
+                    java.util.List<recommend.RecommendedProduct> similarProducts = recService.similarTo(productId, 6);
+
+                    request.setAttribute("alsoBoughtProducts", alsoBoughtProducts);
+                    request.setAttribute("similarProducts", similarProducts);
                 }
             } catch (NumberFormatException e) {
                 e.printStackTrace();
