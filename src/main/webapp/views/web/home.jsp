@@ -62,7 +62,6 @@
 					<c:forEach var="rec" items="${personalizedProducts}">
 						<c:set var="product" value="${rec.product}"/>
 						<div class="swiper-slide product-item">
-							<div class="inner-tag tag-uppercase" style="background-color: #0d6efd; color: #fff;">${rec.reason}</div>
 							<c:if test="${product.discountPercent > 0}">
 								<div class="inner-discount">-${product.discountPercent}<span>%</span></div>
 							</c:if>
