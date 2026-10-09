@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,7 +9,7 @@
 <title>Trang chủ | TA shop</title>
 </head>
 <body>
-	<!-- Section 1 -->
+	<!-- Section 1: Main Banner -->
 	<div class="section-1">
 		<div class="container">
 			<div class="swiper swiperSection1">
@@ -51,6 +52,107 @@
 	</div>
 	<!-- End Section 1 -->
 
+	<!-- Section: Dành Cho Bạn (Personalized Recommendations - ngay dưới Banner) -->
+	<c:if test="${not empty personalizedProducts}">
+	<div class="section-2 mt-4">
+		<div class="container">
+			<h2 class="box-title">DÀNH CHO BẠN</h2>
+			<div class="swiper swiperSection2">
+				<div class="swiper-wrapper">
+					<c:forEach var="rec" items="${personalizedProducts}">
+						<c:set var="product" value="${rec.product}"/>
+						<div class="swiper-slide product-item">
+							<div class="inner-tag tag-uppercase" style="background-color: #0d6efd; color: #fff;">${rec.reason}</div>
+							<c:if test="${product.discountPercent > 0}">
+								<div class="inner-discount">-${product.discountPercent}<span>%</span></div>
+							</c:if>
+							<div class="inner-image">
+								<a href="<c:url value='/public/product-detail?id=${product.productId}&ref=${rec.source}'/>">
+									<img src="<c:url value='${product.productImage}'/>" alt="${product.productName}">
+									<img src="<c:url value='${product.productImage}'/>" alt="${product.productName}" class="hover-img">
+								</a>
+							</div>
+							<div class="inner-content">
+								<div class="inner-meta">
+									<div class="inner-color">
+										<div class="inner-box" style="background-color: ${product.productColor};"></div>
+									</div>
+								</div>
+								<h3 class="inner-title">
+									<a href="<c:url value='/public/product-detail?id=${product.productId}&ref=${rec.source}'/>">${product.productName}</a>
+								</h3>
+								<div class="price-product">
+									<div class="inner-price">
+										<c:choose>
+											<c:when test="${product.discountPercent > 0}">
+												<div class="inner-price-new"><fmt:formatNumber value="${product.productPrice - (product.productPrice * product.discountPercent / 100)}" pattern="###,###"/>đ</div>
+												<div class="inner-price-old"><fmt:formatNumber value="${product.productPrice}" pattern="###,###"/>đ</div>
+											</c:when>
+											<c:otherwise>
+												<div class="inner-price-new"><fmt:formatNumber value="${product.productPrice}" pattern="###,###"/>đ</div>
+											</c:otherwise>
+										</c:choose>
+									</div>
+								</div>
+							</div>
+						</div>
+					</c:forEach>
+				</div>
+				<div class="swiper-button-next swiper-button-next-custom"><i class="bi bi-arrow-right"></i></div>
+				<div class="swiper-button-prev swiper-button-prev-custom"><i class="bi bi-arrow-left"></i></div>
+			</div>
+		</div>
+	</div>
+	</c:if>
+
+	<!-- Section: Đang Được Quan Tâm (Trending Recommendations - ngay sau Dành cho bạn) -->
+	<c:if test="${not empty trendingProducts}">
+	<div class="section-2 mt-4">
+		<div class="container">
+			<h2 class="box-title">ĐANG ĐƯỢC QUAN TÂM</h2>
+			<div class="swiper swiperSection2">
+				<div class="swiper-wrapper">
+					<c:forEach var="rec" items="${trendingProducts}">
+						<c:set var="product" value="${rec.product}"/>
+						<div class="swiper-slide product-item">
+							<div class="inner-tag tag-uppercase" style="background-color: #ffc107; color: #000;">HOT</div>
+							<c:if test="${product.discountPercent > 0}">
+								<div class="inner-discount">-${product.discountPercent}<span>%</span></div>
+							</c:if>
+							<div class="inner-image">
+								<a href="<c:url value='/public/product-detail?id=${product.productId}&ref=${rec.source}'/>">
+									<img src="<c:url value='${product.productImage}'/>" alt="${product.productName}">
+									<img src="<c:url value='${product.productImage}'/>" alt="${product.productName}" class="hover-img">
+								</a>
+							</div>
+							<div class="inner-content">
+								<h3 class="inner-title">
+									<a href="<c:url value='/public/product-detail?id=${product.productId}&ref=${rec.source}'/>">${product.productName}</a>
+								</h3>
+								<div class="price-product">
+									<div class="inner-price">
+										<c:choose>
+											<c:when test="${product.discountPercent > 0}">
+												<div class="inner-price-new">${product.productPrice - (product.productPrice * product.discountPercent / 100)}đ</div>
+												<div class="inner-price-old">${product.productPrice}đ</div>
+											</c:when>
+											<c:otherwise>
+												<div class="inner-price-new">${product.productPrice}đ</div>
+											</c:otherwise>
+										</c:choose>
+									</div>
+								</div>
+							</div>
+						</div>
+					</c:forEach>
+				</div>
+				<div class="swiper-button-next swiper-button-next-custom"><i class="bi bi-arrow-right"></i></div>
+				<div class="swiper-button-prev swiper-button-prev-custom"><i class="bi bi-arrow-left"></i></div>
+			</div>
+		</div>
+	</div>
+	</c:if>
+
 	<!-- Section 2: New Arrival -->
 	<div class="section-2">
 		<div class="container">
@@ -89,7 +191,6 @@
 								<div class="price-product">
 									<div class="inner-price">
 										<div class="inner-price-new">${product.productPrice}đ</div>
-<%--										<div class="inner-price-old">${product.productPrice}đ</div>--%>
 									</div>
 									<div class="inner-bag dropdown">
 										<a href="#" role="button" data-bs-toggle="dropdown"
@@ -202,108 +303,37 @@
 	</div>
 	<!-- End Section 2 more -->
 
-	<!-- Section: Dành Cho Bạn (Personalized Recommendations) -->
-	<c:if test="${not empty personalizedProducts}">
-	<div class="section-2 mt-4">
+	<!-- Section 3 -->
+	<div class="section-3">
 		<div class="container">
-			<h2 class="box-title">DÀNH CHO BẠN</h2>
-			<div class="swiper swiperSection2">
-				<div class="swiper-wrapper">
-					<c:forEach var="rec" items="${personalizedProducts}">
-						<c:set var="product" value="${rec.product}"/>
-						<div class="swiper-slide product-item">
-							<div class="inner-tag tag-uppercase" style="background-color: #0d6efd; color: #fff;">${rec.reason}</div>
-							<c:if test="${product.discountPercent > 0}">
-								<div class="inner-discount">-${product.discountPercent}<span>%</span></div>
-							</c:if>
-							<div class="inner-image">
-								<a href="<c:url value='/public/product-detail?id=${product.productId}&ref=${rec.source}'/>">
-									<img src="<c:url value='${product.productImage}'/>" alt="${product.productName}">
-									<img src="<c:url value='${product.productImage}'/>" alt="${product.productName}" class="hover-img">
-								</a>
-							</div>
-							<div class="inner-content">
-								<div class="inner-meta">
-									<div class="inner-color">
-										<div class="inner-box" style="background-color: ${product.productColor};"></div>
-									</div>
-								</div>
-								<h3 class="inner-title">
-									<a href="<c:url value='/public/product-detail?id=${product.productId}&ref=${rec.source}'/>">${product.productName}</a>
-								</h3>
-								<div class="price-product">
-									<div class="inner-price">
-										<c:choose>
-											<c:when test="${product.discountPercent > 0}">
-												<div class="inner-price-new"><fmt:formatNumber value="${product.productPrice - (product.productPrice * product.discountPercent / 100)}" pattern="###,###"/>đ</div>
-												<div class="inner-price-old"><fmt:formatNumber value="${product.productPrice}" pattern="###,###"/>đ</div>
-											</c:when>
-											<c:otherwise>
-												<div class="inner-price-new"><fmt:formatNumber value="${product.productPrice}" pattern="###,###"/>đ</div>
-											</c:otherwise>
-										</c:choose>
-									</div>
-								</div>
-							</div>
-						</div>
-					</c:forEach>
+			<h2 class="box-title">NEW COLLECTION 2025</h2>
+			<div class="inner-wrap">
+				<div class="inner-item">
+					<a href="#"> <img
+						src="<c:url value='/templates/web/images/image-1.webp'/>" alt="">
+					</a>
 				</div>
-				<div class="swiper-button-next swiper-button-next-custom"><i class="bi bi-arrow-right"></i></div>
-				<div class="swiper-button-prev swiper-button-prev-custom"><i class="bi bi-arrow-left"></i></div>
+				<div class="inner-item">
+					<a href="#"> <img
+						src="<c:url value='/templates/web/images/image-2.webp'/>" alt="">
+					</a>
+				</div>
+				<div class="inner-item">
+					<a href="#"> <img
+						src="<c:url value='/templates/web/images/image-3.webp'/>" alt="">
+					</a>
+				</div>
+				<div class="inner-item">
+					<a href="#"> <img
+						src="<c:url value='/templates/web/images/image-4.webp'/>" alt="">
+					</a>
+				</div>
 			</div>
 		</div>
 	</div>
-	</c:if>
+	<!-- End Section 3 -->
 
-	<!-- Section: Đang Được Quan Tâm (Trending Recommendations) -->
-	<c:if test="${not empty trendingProducts}">
-	<div class="section-2 mt-4">
-		<div class="container">
-			<h2 class="box-title">ĐANG ĐƯỢC QUAN TÂM</h2>
-			<div class="swiper swiperSection2">
-				<div class="swiper-wrapper">
-					<c:forEach var="rec" items="${trendingProducts}">
-						<c:set var="product" value="${rec.product}"/>
-						<div class="swiper-slide product-item">
-							<div class="inner-tag tag-uppercase" style="background-color: #ffc107; color: #000;">HOT</div>
-							<c:if test="${product.discountPercent > 0}">
-								<div class="inner-discount">-${product.discountPercent}<span>%</span></div>
-							</c:if>
-							<div class="inner-image">
-								<a href="<c:url value='/public/product-detail?id=${product.productId}&ref=${rec.source}'/>">
-									<img src="<c:url value='${product.productImage}'/>" alt="${product.productName}">
-									<img src="<c:url value='${product.productImage}'/>" alt="${product.productName}" class="hover-img">
-								</a>
-							</div>
-							<div class="inner-content">
-								<h3 class="inner-title">
-									<a href="<c:url value='/public/product-detail?id=${product.productId}&ref=${rec.source}'/>">${product.productName}</a>
-								</h3>
-								<div class="price-product">
-									<div class="inner-price">
-										<c:choose>
-											<c:when test="${product.discountPercent > 0}">
-												<div class="inner-price-new">${product.productPrice - (product.productPrice * product.discountPercent / 100)}đ</div>
-												<div class="inner-price-old">${product.productPrice}đ</div>
-											</c:when>
-											<c:otherwise>
-												<div class="inner-price-new">${product.productPrice}đ</div>
-											</c:otherwise>
-										</c:choose>
-									</div>
-								</div>
-							</div>
-						</div>
-					</c:forEach>
-				</div>
-				<div class="swiper-button-next swiper-button-next-custom"><i class="bi bi-arrow-right"></i></div>
-				<div class="swiper-button-prev swiper-button-prev-custom"><i class="bi bi-arrow-left"></i></div>
-			</div>
-		</div>
-	</div>
-	</c:if>
-
-	<!-- Section: Bạn Đã Xem Gần Đây (Recently Viewed) -->
+	<!-- Section: Bạn Đã Xem Gần Đây (Recently Viewed - ở cuối trang ngay trên Footer) -->
 	<c:if test="${not empty recentlyViewedProducts}">
 	<div class="section-2 mt-4">
 		<div class="container">
@@ -338,35 +368,5 @@
 		</div>
 	</div>
 	</c:if>
-
-	<!-- Section 3 -->
-	<div class="section-3">
-		<div class="container">
-			<h2 class="box-title">NEW COLLECTION 2025</h2>
-			<div class="inner-wrap">
-				<div class="inner-item">
-					<a href="#"> <img
-						src="<c:url value='/templates/web/images/image-1.webp'/>" alt="">
-					</a>
-				</div>
-				<div class="inner-item">
-					<a href="#"> <img
-						src="<c:url value='/templates/web/images/image-2.webp'/>" alt="">
-					</a>
-				</div>
-				<div class="inner-item">
-					<a href="#"> <img
-						src="<c:url value='/templates/web/images/image-3.webp'/>" alt="">
-					</a>
-				</div>
-				<div class="inner-item">
-					<a href="#"> <img
-						src="<c:url value='/templates/web/images/image-4.webp'/>" alt="">
-					</a>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- End Section 3 -->
 </body>
 </html>
