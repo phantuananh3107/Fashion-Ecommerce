@@ -93,6 +93,9 @@ public class AddToCartController extends HttpServlet {
             // 4. Nếu đủ tồn kho -> Thực hiện thêm vào giỏ hàng
             cartDAO.addToCart(user.getUserId(), productId, quantityToAdd, size);
 
+            // Log ADD_TO_CART behavior
+            service.BehaviorTracker.trackAddToCart(user.getUserId(), session.getId(), productId);
+
             // 5. Lấy lại list mới nhất từ DB để Session/Sidebar hiển thị đúng
             List<CartObject> updatedCart = cartDAO.getCartItems(user.getUserId());
             session.setAttribute("cart", updatedCart);

@@ -47,6 +47,12 @@ public class CartController extends HttpServlet {
             request.setAttribute("cartItems", cartItems);
             request.setAttribute("totalQuantity", totalQuantity);
             request.setAttribute("totalPrice", totalPrice);
+
+            // Gợi ý cho trang giỏ hàng: "Có thể bạn quan tâm"
+            recommend.RecommendationService recService = new recommend.RecommendationService();
+            List<recommend.RecommendedProduct> cartMayLikeProducts = recService.forUser(userObject.getUserId(), session.getId(), 6);
+            request.setAttribute("cartMayLikeProducts", cartMayLikeProducts);
+
             RequestDispatcher rd = request.getRequestDispatcher("/views/web/cart.jsp");
             rd.forward(request, response);
         }

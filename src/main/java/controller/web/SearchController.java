@@ -27,6 +27,18 @@ public class SearchController extends HttpServlet {
         // 1. Gọi hàm search (đã nâng cấp tìm cả danh mục)
         List<ProductObject> allResults = productDAO.searchProducts(keyword.trim());
 
+        if (!keyword.trim().isEmpty()) {
+            model.UserObject user = (model.UserObject) request.getSession().getAttribute("user");
+            Integer userId = (user != null) ? user.getUserId() : null;
+            String sessionId = request.getSession().getId();
+
+            List<Integer> topIds = new ArrayList<>();
+            for (int i = 0; i < Math.min(5, allResults.size()); i++) {
+                topIds.add(allResults.get(i).getProductId());
+            }
+            service.BehaviorTracker.trackSearch(userId, sessionId, keyword.trim(), topIds);
+        }
+
         // 2. Bơm danh sách màu sắc để cột trái không bị trống (Sửa lỗi ảnh 2)
         List<String> colorList = productDAO.getColorsByCategoryId(0);
         request.setAttribute("colorList", colorList);

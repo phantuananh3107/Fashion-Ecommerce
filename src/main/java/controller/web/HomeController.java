@@ -49,9 +49,22 @@ public class HomeController extends HttpServlet {
                 saleProducts = saleProducts.subList(0, 10);
             }
 
-            // 3. Đẩy dữ liệu ra ngoài file home.jsp
+            // 3. Lấy dữ liệu gợi ý sản phẩm
+            model.UserObject user = (model.UserObject) req.getSession().getAttribute("user");
+            Integer userId = (user != null) ? user.getUserId() : null;
+            String sessionId = req.getSession().getId();
+
+            recommend.RecommendationService recService = new recommend.RecommendationService();
+            List<recommend.RecommendedProduct> personalizedProducts = recService.forUser(userId, sessionId, 8);
+            List<recommend.RecommendedProduct> trendingProducts = recService.trending(8);
+            List<recommend.RecommendedProduct> recentlyViewedProducts = recService.recentlyViewed(userId, sessionId, 8);
+
+            // 4. Đẩy dữ liệu ra ngoài file home.jsp
             req.setAttribute("newArrivals", newArrivals);
             req.setAttribute("saleProducts", saleProducts);
+            req.setAttribute("personalizedProducts", personalizedProducts);
+            req.setAttribute("trendingProducts", trendingProducts);
+            req.setAttribute("recentlyViewedProducts", recentlyViewedProducts);
 
             RequestDispatcher rd = req.getRequestDispatcher("/views/web/home.jsp");
             rd.forward(req, resp);

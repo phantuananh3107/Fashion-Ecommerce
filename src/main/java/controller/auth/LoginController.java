@@ -157,6 +157,9 @@ public class LoginController extends HttpServlet {
 				session.setAttribute("fullname", userObject.getFullname());
 				session.setAttribute("email", userObject.getEmail());
 
+				// Sync anonymous session behavior logs to logged-in user ID
+				service.BehaviorTracker.syncSessionUser(session.getId(), userObject.getUserId());
+
 				String roleName = userObject.getRole().getRoleName();
 				session.setAttribute("role", roleName);
 
