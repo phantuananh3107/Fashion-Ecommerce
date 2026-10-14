@@ -64,14 +64,42 @@
         </div>
 
         <div class="info-box">
+            <h2>🧠 Kiến trúc ChatBot 3 tầng (chạy hoàn toàn local)</h2>
+            <p>Toàn bộ chatbot chạy trên máy, <strong>không gọi cloud API</strong> — không tốn chi phí.</p>
+            <ol>
+                <li><strong>Tầng 1 — Rule matcher</strong> (~1ms): keyword + regex, token-based matching,
+                    xử lý ý định rõ ràng như <code>DH1234</code>, <code>hủy đơn</code>, chào hỏi</li>
+                <li><strong>Tầng 2 — JEV embedding</strong> (~45–89ms): <code>multilingual-e5-small</code>,
+                    so cosine với centroid từng intent, bắt được câu không dấu / diễn đạt lại</li>
+                <li><strong>Tầng 3 — LLM tool-calling</strong> (~1–4s): <code>Qwen2.5 7B Q4_K_M</code> qua Ollama,
+                    được <strong>ép gọi tool</strong> để lấy dữ liệu thật, không được bịa giá hay tồn kho</li>
+            </ol>
+            <p>Độ chính xác đo trên tập kiểm thử (46 câu hold-out):
+                Rule 71.7% · JEV 80.4% · <strong>Hybrid 82.6%</strong></p>
+        </div>
+
+        <div class="info-box">
             <h2>🔧 Checklist</h2>
             <p>
-                <span class="success">✓ ChatBotConfig.java</span> - Loads .env config<br>
-                <span class="success">✓ ChatBotService.java</span> - Calls OpenAI API<br>
+                <span class="success">✓ ChatBotConfig.java</span> - Đọc .env, trỏ tới FastAPI<br>
+                <span class="success">✓ ChatBotClient.java</span> - Gửi POST JSON /api/chat<br>
+                <span class="success">✓ ChatBotService.java</span> - Facade + fallback offline<br>
                 <span class="success">✓ ChatBotController.java</span> - AJAX handler (@WebServlet("/chatbot"))<br>
                 <span class="success">✓ chatbot.jsp</span> - UI Widget<br>
-                <span class="success">✓ chatbot.js</span> - Event handling<br>
+                <span class="success">✓ chatbot.js</span> - Event handling (không cần sửa)<br>
+                <span class="success">✓ chatbot-service/</span> - FastAPI 3 tầng (ngoài repo này)
             </p>
+        </div>
+
+        <div class="info-box">
+            <h2>🚀 Khởi động Chatbot (trước khi test)</h2>
+            <ol>
+                <li>Mở terminal tại thư mục <code>chatbot-service/</code></li>
+                <li>Chạy Ollama: <code>ollama serve</code> (nếu chưa chạy)</li>
+                <li>Chạy FastAPI: <code>uvicorn app.main:app --host 0.0.0.0 --port 8000</code></li>
+                <li>Kiểm tra: mở <code>http://localhost:8000/health</code> — cần thấy <code>"ok": true</code></li>
+                <li>Deploy WAR lên Tomcat, copy <code>.env.example</code> → <code>.env</code></li>
+            </ol>
         </div>
 
         <div class="info-box">
@@ -79,9 +107,9 @@
             <ol>
                 <li>Scroll down to see if <code>TA shop ChatBot</code> button appears at bottom-right</li>
                 <li>Click the button → Widget should pop up with animation</li>
-                <li>Type a message in Vietnamese: <code>Xin chào</code></li>
-                <li>Press Enter or click Send button</li>
-                <li>Wait 2-5 seconds for AI response</li>
+                <li>Type a message in Vietnamese: <code>Xin chào</code> (tầng 1, trả lời ngay)</li>
+                <li>Try: <code>tìm áo thun đen size L</code> (tầng 1/2, gọi search_products)</li>
+                <li>Try: <code>đơn DH1234 đang ở đâu</code> (tầng 1, gọi get_order)</li>
                 <li>If you get a response → ChatBot is working! 🎉</li>
             </ol>
         </div>
@@ -113,9 +141,9 @@
         <div class="info-box" style="background: #fff3cd;">
             <h2>⚠️ Important Notes</h2>
             <ul>
-                <li>Make sure <code>.env</code> file exists in project root with <code>OPENAI_API_KEY</code></li>
-                <li>API calls cost money - set budget alert on OpenAI account</li>
-                <li>First response may take 3-5 seconds (API latency)</li>
+                <li>Đảm bảo FastAPI đang chạy ở <code>CHATBOT_API_URL</code> trước khi test (mặc định <code>http://localhost:8000/api/chat</code>)</li>
+                <li>Chatbot chạy local — <strong>không tốn chi phí API</strong>, không cần key cloud</li>
+                <li>Tầng 3 (LLM) lần đầu có thể 8–18s trên CPU; các lần sau &amp; tầng 1/2 nhanh hơn</li>
                 <li>Vietnamese text should display correctly (UTF-8)</li>
             </ul>
         </div>

@@ -1,0 +1,322 @@
+{"text": "tìm áo thun nam màu đen size L", "intent": "find_product", "split": "train", "source": "original"}
+{"text": "có váy nào dưới 300k không", "intent": "find_product", "split": "train", "source": "original"}
+{"text": "áo khoác jean", "intent": "find_product", "split": "train", "source": "original"}
+{"text": "cho xem quần jean nữ", "intent": "find_product", "split": "train", "source": "original"}
+{"text": "muốn mua đầm dự tiệc", "intent": "find_product", "split": "train", "source": "original"}
+{"text": "tìm áo sơ mi trắng", "intent": "find_product", "split": "train", "source": "original"}
+{"text": "có quần short không", "intent": "find_product", "split": "train", "source": "original"}
+{"text": "áo hoodie", "intent": "find_product", "split": "train", "source": "original"}
+{"text": "tìm đồ cho nam", "intent": "find_product", "split": "train", "source": "original"}
+{"text": "quần áo trẻ em", "intent": "find_product", "split": "train", "source": "original"}
+{"text": "áo thun", "intent": "find_product", "split": "train", "source": "original"}
+{"text": "tim ao thun den", "intent": "find_product", "split": "train", "source": "original"}
+{"text": "áo thun đen giá rẻ", "intent": "find_product", "split": "train", "source": "original"}
+{"text": "có bán giày không", "intent": "find_product", "split": "train", "source": "original"}
+{"text": "tìm áo crop top", "intent": "find_product", "split": "train", "source": "original"}
+{"text": "váy maxi", "intent": "find_product", "split": "train", "source": "original"}
+{"text": "áo len mùa đông", "intent": "find_product", "split": "train", "source": "original"}
+{"text": "tìm set đồ công sở", "intent": "find_product", "split": "train", "source": "original"}
+{"text": "cho xem sản phẩm mới", "intent": "find_product", "split": "train", "source": "original"}
+{"text": "shop có túi xách không", "intent": "find_product", "split": "train", "source": "original"}
+{"text": "áo thun đen size M còn hàng không", "intent": "check_availability", "split": "train", "source": "original"}
+{"text": "váy đỏ còn không", "intent": "check_availability", "split": "train", "source": "original"}
+{"text": "size L còn không", "intent": "check_availability", "split": "train", "source": "original"}
+{"text": "màu trắng còn hàng không", "intent": "check_availability", "split": "train", "source": "original"}
+{"text": "con hang khong shop", "intent": "check_availability", "split": "train", "source": "original"}
+{"text": "áo khoác này giá bao nhiêu", "intent": "price_query", "split": "train", "source": "original"}
+{"text": "váy đỏ bao nhiêu tiền", "intent": "price_query", "split": "train", "source": "original"}
+{"text": "giá quần jean nam", "intent": "price_query", "split": "train", "source": "original"}
+{"text": "gia bao nhieu shop", "intent": "price_query", "split": "train", "source": "original"}
+{"text": "có mã giảm giá không", "intent": "promotion_query", "split": "train", "source": "original"}
+{"text": "đang có khuyến mãi gì", "intent": "promotion_query", "split": "train", "source": "original"}
+{"text": "freeship không shop", "intent": "promotion_query", "split": "train", "source": "original"}
+{"text": "voucher 50k còn không", "intent": "promotion_query", "split": "train", "source": "original"}
+{"text": "bảng size áo thun", "intent": "size_guide", "split": "train", "source": "original"}
+{"text": "mình 60kg mặc size gì", "intent": "size_guide", "split": "train", "source": "original"}
+{"text": "size M bao nhiêu kg", "intent": "size_guide", "split": "train", "source": "original"}
+{"text": "tư vấn size quần jean", "intent": "size_guide", "split": "train", "source": "original"}
+{"text": "đơn DH1234 đang ở đâu", "intent": "track_order", "split": "train", "source": "original"}
+{"text": "kiểm tra đơn hàng 0123456789", "intent": "track_order", "split": "train", "source": "original"}
+{"text": "đơn của mình giao chưa", "intent": "track_order", "split": "train", "source": "original"}
+{"text": "tra đơn DH999", "intent": "track_order", "split": "train", "source": "original"}
+{"text": "đơn hàng của mình đến đâu rồi", "intent": "track_order", "split": "train", "source": "original"}
+{"text": "don hang nao ban", "intent": "track_order", "split": "train", "source": "original"}
+{"text": "hủy đơn DH5678", "intent": "cancel_order", "split": "train", "source": "original"}
+{"text": "muốn hủy đơn hàng", "intent": "cancel_order", "split": "train", "source": "original"}
+{"text": "không lấy nữa", "intent": "cancel_order", "split": "train", "source": "original"}
+{"text": "ship bao lâu", "intent": "check_policy", "split": "train", "source": "original"}
+{"text": "đổi trả thế nào", "intent": "check_policy", "split": "train", "source": "original"}
+{"text": "thanh toán cod được không", "intent": "check_policy", "split": "train", "source": "original"}
+{"text": "có trả hàng không", "intent": "check_policy", "split": "train", "source": "original"}
+{"text": "chính sách bảo hành ra sao", "intent": "check_policy", "split": "train", "source": "original"}
+{"text": "áo này có ai đánh giá chưa", "intent": "review_query", "split": "train", "source": "original"}
+{"text": "xem review váy đỏ", "intent": "review_query", "split": "train", "source": "original"}
+{"text": "sản phẩm này tốt không", "intent": "review_query", "split": "train", "source": "original"}
+{"text": "áo bị lỗi", "intent": "complaint", "split": "train", "source": "original"}
+{"text": "giao sai hàng", "intent": "complaint", "split": "train", "source": "original"}
+{"text": "muốn khiếu nại", "intent": "complaint", "split": "train", "source": "original"}
+{"text": "gặp nhân viên", "intent": "human_handoff", "split": "train", "source": "original"}
+{"text": "cho gặp người thật", "intent": "human_handoff", "split": "train", "source": "original"}
+{"text": "nhân viên tư vấn", "intent": "human_handoff", "split": "train", "source": "original"}
+{"text": "xin chào", "intent": "greeting", "split": "train", "source": "original"}
+{"text": "hello shop", "intent": "greeting", "split": "train", "source": "original"}
+{"text": "chào shop", "intent": "greeting", "split": "train", "source": "original"}
+{"text": "hi", "intent": "greeting", "split": "train", "source": "original"}
+{"text": "tạm biệt", "intent": "goodbye", "split": "train", "source": "original"}
+{"text": "bye", "intent": "goodbye", "split": "train", "source": "original"}
+{"text": "hẹn gặp lại", "intent": "goodbye", "split": "train", "source": "original"}
+{"text": "cảm ơn", "intent": "thanks", "split": "train", "source": "original"}
+{"text": "thanks shop", "intent": "thanks", "split": "train", "source": "original"}
+{"text": "cam on ban", "intent": "thanks", "split": "train", "source": "original"}
+{"text": "thời tiết hôm nay thế nào", "intent": "out_of_scope", "split": "train", "source": "original"}
+{"text": "giải phương trình x^2 + 1 = 0", "intent": "out_of_scope", "split": "train", "source": "original"}
+{"text": "ai là tổng thống hiện tại", "intent": "out_of_scope", "split": "train", "source": "original"}
+{"text": "kể chuyện cười đi", "intent": "out_of_scope", "split": "train", "source": "original"}
+{"text": "dịch câu này sang tiếng anh", "intent": "out_of_scope", "split": "train", "source": "original"}
+{"text": "viết code python cho mình", "intent": "out_of_scope", "split": "train", "source": "original"}
+{"text": "đá bóng tối nay ai thắng", "intent": "out_of_scope", "split": "train", "source": "original"}
+{"text": "giá chứng khoán hôm nay", "intent": "out_of_scope", "split": "train", "source": "original"}
+{"text": "chính sách bầu cử ra sao", "intent": "out_of_scope", "split": "train", "source": "original"}
+{"text": "hướng dẫn mổ tim", "intent": "out_of_scope", "split": "train", "source": "original"}
+{"text": "???", "intent": "unclear", "split": "train", "source": "original"}
+{"text": "sao", "intent": "unclear", "split": "train", "source": "original"}
+{"text": ".", "intent": "unclear", "split": "train", "source": "original"}
+{"text": "cái này", "intent": "unclear", "split": "train", "source": "original"}
+{"text": "á", "intent": "unclear", "split": "train", "source": "original"}
+{"text": "mình đi biển cuối tuần mặc gì đẹp", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "có áo nào mỏng mát cho mùa hè không", "intent": "find_product", "split": "test", "source": "paraphrase"}
+{"text": "tìm quần tây đen cho đi làm", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "có váy ôm dáng đẹp không", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "cho tôi xem đồ mùa thu", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "tìm áo khoác dưới 500k", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "đồ nữ đi làm công sở nên mặc gì", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "áo thun trắng basic còn không shop", "intent": "find_product", "split": "test", "source": "paraphrase"}
+{"text": "có quần kaki nữ không", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "tìm áo bomber nam", "intent": "find_product", "split": "test", "source": "paraphrase"}
+{"text": "muốn mua váy dạ hộp", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "gợi ý đồ mặc hôm nay", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "đồ mặc đi dạo phố cuối tuần", "intent": "find_product", "split": "test", "source": "paraphrase"}
+{"text": "tìm áo polo nữ trắng", "intent": "find_product", "split": "test", "source": "paraphrase"}
+{"text": "có đồ vest nam không", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "áo sweater ấm mùa lạnh", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "tìm quần lụng nam", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "shop có bán áo khoác không", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "cho xem đồ mới nhất", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "áo dạ hộp nữ đẹp", "intent": "find_product", "split": "test", "source": "paraphrase"}
+{"text": "tìm quần short nữ", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "đồ trẻ em cute", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "tôi cần mua áo sơ mi đi làm", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "có áo phông nữ không", "intent": "find_product", "split": "test", "source": "paraphrase"}
+{"text": "tìm set đồ ở nhà", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "áo sơ mi kẻ sọc", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "cho tôi xem túi xách", "intent": "find_product", "split": "test", "source": "paraphrase"}
+{"text": "đồ thời trang nữ cao cấp", "intent": "find_product", "split": "test", "source": "paraphrase"}
+{"text": "mua quần vải cho con", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "tim quan ao lot nữ", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "co ao khoac puach khong", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "tim ao som mi nam", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "ao thun trang co khong", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "co ao croptop ko", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "tim set do van phong dep", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "ao mua dot nuoc roi sao re", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "tôi cần tìm một chiếc áo thun nữ chất liệu cotton màu trắng cho mùa hè", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "shop có bán quần jean nữ ống rộng không ạ", "intent": "find_product", "split": "train", "source": "paraphrase"}
+{"text": "áo này còn bao nhiêu chiếc", "intent": "check_availability", "split": "train", "source": "paraphrase"}
+{"text": "size M còn hàng không shop", "intent": "check_availability", "split": "train", "source": "paraphrase"}
+{"text": "màu xanh còn không", "intent": "check_availability", "split": "train", "source": "paraphrase"}
+{"text": "đơn này còn bao nhiêu hàng", "intent": "check_availability", "split": "test", "source": "paraphrase"}
+{"text": "áo hoodie đen còn hàng ko", "intent": "check_availability", "split": "train", "source": "paraphrase"}
+{"text": "còn hàng không áo thun trắng", "intent": "check_availability", "split": "train", "source": "paraphrase"}
+{"text": "váy đen size S còn không", "intent": "check_availability", "split": "test", "source": "paraphrase"}
+{"text": "quần jean còn size 30 không", "intent": "check_availability", "split": "train", "source": "paraphrase"}
+{"text": "shop còn item này không", "intent": "check_availability", "split": "test", "source": "paraphrase"}
+{"text": "còn size nào của áo khoác", "intent": "check_availability", "split": "train", "source": "paraphrase"}
+{"text": "ao thun den con hang ko", "intent": "check_availability", "split": "train", "source": "paraphrase"}
+{"text": "size l con khong", "intent": "check_availability", "split": "train", "source": "paraphrase"}
+{"text": "con hang chua shop", "intent": "check_availability", "split": "train", "source": "paraphrase"}
+{"text": "con size M ko", "intent": "check_availability", "split": "train", "source": "paraphrase"}
+{"text": "hang con ko shop", "intent": "check_availability", "split": "train", "source": "paraphrase"}
+{"text": "cho tôi hỏi chiếc áo khoác denim này còn hàng không ạ", "intent": "check_availability", "split": "train", "source": "paraphrase"}
+{"text": "váy này giá bao nhiêu", "intent": "price_query", "split": "train", "source": "paraphrase"}
+{"text": "áo hoodie bao nhiêu tiền", "intent": "price_query", "split": "train", "source": "paraphrase"}
+{"text": "giá quần short nữ", "intent": "price_query", "split": "test", "source": "paraphrase"}
+{"text": "cho tôi hỏi giá chiếc giày này", "intent": "price_query", "split": "train", "source": "paraphrase"}
+{"text": "đồ này giá bao nhiêu vậy", "intent": "price_query", "split": "test", "source": "paraphrase"}
+{"text": "giá set đồ công sở", "intent": "price_query", "split": "train", "source": "paraphrase"}
+{"text": "áo sơ mi bao nhiêu", "intent": "price_query", "split": "train", "source": "paraphrase"}
+{"text": "tính giá giúp tôi cái váy", "intent": "price_query", "split": "train", "source": "paraphrase"}
+{"text": "gia bao nhieu ao hoodie", "intent": "price_query", "split": "train", "source": "paraphrase"}
+{"text": "quan jean gia bao nhieu", "intent": "price_query", "split": "train", "source": "paraphrase"}
+{"text": "gia ao khoac bn", "intent": "price_query", "split": "train", "source": "paraphrase"}
+{"text": "bao nhieu tien cai day", "intent": "price_query", "split": "train", "source": "paraphrase"}
+{"text": "cho tôi biết chiếc áo len mùa đông này giá bao nhiêu ạ", "intent": "price_query", "split": "train", "source": "paraphrase"}
+{"text": "shop đang có ưu đãi gì", "intent": "promotion_query", "split": "test", "source": "paraphrase"}
+{"text": "có mã giảm giá nào không", "intent": "promotion_query", "split": "train", "source": "paraphrase"}
+{"text": "mua 2 cái có được giảm không", "intent": "promotion_query", "split": "train", "source": "paraphrase"}
+{"text": "đang sale mấy phần", "intent": "promotion_query", "split": "train", "source": "paraphrase"}
+{"text": "voucher của shop gửi ở đâu", "intent": "promotion_query", "split": "train", "source": "paraphrase"}
+{"text": "có freeship không", "intent": "promotion_query", "split": "train", "source": "paraphrase"}
+{"text": "khuyến mãi tháng này là gì", "intent": "promotion_query", "split": "train", "source": "paraphrase"}
+{"text": "mã ưu đãi dùng ở đâu", "intent": "promotion_query", "split": "train", "source": "paraphrase"}
+{"text": "shop có giảm giá cho khách mới không", "intent": "promotion_query", "split": "train", "source": "paraphrase"}
+{"text": "co ma giam gia khong", "intent": "promotion_query", "split": "train", "source": "paraphrase"}
+{"text": "shop dang sale gi", "intent": "promotion_query", "split": "train", "source": "paraphrase"}
+{"text": "voucher con khong", "intent": "promotion_query", "split": "train", "source": "paraphrase"}
+{"text": "co freeship ko", "intent": "promotion_query", "split": "train", "source": "paraphrase"}
+{"text": "khuyen mai gi bay gio", "intent": "promotion_query", "split": "train", "source": "paraphrase"}
+{"text": "cho tôi hỏi shop có mã giảm giá nào đang chạy không ạ", "intent": "promotion_query", "split": "train", "source": "paraphrase"}
+{"text": "mình cao 1m70 nặng 60kg mặc size gì", "intent": "size_guide", "split": "train", "source": "paraphrase"}
+{"text": "áo này size M là bao nhiêu kg", "intent": "size_guide", "split": "train", "source": "paraphrase"}
+{"text": "tôi mập có mặc được không", "intent": "size_guide", "split": "train", "source": "paraphrase"}
+{"text": "bảng size của shop", "intent": "size_guide", "split": "train", "source": "paraphrase"}
+{"text": "quần jean này chọn size nào", "intent": "size_guide", "split": "train", "source": "paraphrase"}
+{"text": "size XL rộng bao nhiêu", "intent": "size_guide", "split": "train", "source": "paraphrase"}
+{"text": "tư vấn giúp tôi chọn size", "intent": "size_guide", "split": "test", "source": "paraphrase"}
+{"text": "áo khoác size S có vừa với người gầy không", "intent": "size_guide", "split": "test", "source": "paraphrase"}
+{"text": "bang size ao thun", "intent": "size_guide", "split": "test", "source": "paraphrase"}
+{"text": "minh 60kg mac size gi", "intent": "size_guide", "split": "train", "source": "paraphrase"}
+{"text": "bang size co khong", "intent": "size_guide", "split": "train", "source": "paraphrase"}
+{"text": "tu van size giup minh", "intent": "size_guide", "split": "train", "source": "paraphrase"}
+{"text": "mình cao 1m75 nặng 70kg thì nên chọn size áo thun bao nhiêu ạ", "intent": "size_guide", "split": "test", "source": "paraphrase"}
+{"text": "đơn DH2024 của tôi đến đâu rồi", "intent": "track_order", "split": "train", "source": "paraphrase"}
+{"text": "ship của tôi bao giờ tới", "intent": "track_order", "split": "train", "source": "paraphrase"}
+{"text": "tra cứu đơn hàng DH8888", "intent": "track_order", "split": "train", "source": "paraphrase"}
+{"text": "đơn hàng giao chưa shop", "intent": "track_order", "split": "train", "source": "paraphrase"}
+{"text": "tôi mua hôm qua, hàng đang ở đâu", "intent": "track_order", "split": "train", "source": "paraphrase"}
+{"text": "đơn của tôi còn bao lâu nữa tới", "intent": "track_order", "split": "test", "source": "paraphrase"}
+{"text": "kiểm tra đơn 0123456789 giúp tôi", "intent": "track_order", "split": "train", "source": "paraphrase"}
+{"text": "hàng tôi đặt bao giờ ship", "intent": "track_order", "split": "train", "source": "paraphrase"}
+{"text": "đơn DH777 đã giao chưa", "intent": "track_order", "split": "train", "source": "paraphrase"}
+{"text": "don DH1234 dang o dau", "intent": "track_order", "split": "train", "source": "paraphrase"}
+{"text": "tra don hang cua toi", "intent": "track_order", "split": "train", "source": "paraphrase"}
+{"text": "kiem tra don 0123456789", "intent": "track_order", "split": "test", "source": "paraphrase"}
+{"text": "don cua minh co den chua", "intent": "track_order", "split": "train", "source": "paraphrase"}
+{"text": "ship den dau roi", "intent": "track_order", "split": "train", "source": "paraphrase"}
+{"text": "cho tôi tra cứu đơn hàng DH5555 tôi đặt hôm qua ạ", "intent": "track_order", "split": "train", "source": "paraphrase"}
+{"text": "tôi muốn hủy đơn này", "intent": "cancel_order", "split": "train", "source": "paraphrase"}
+{"text": "hủy DH3333 giúp tôi", "intent": "cancel_order", "split": "train", "source": "paraphrase"}
+{"text": "đặt nhầm rồi, hủy đơn giúp tôi", "intent": "cancel_order", "split": "train", "source": "paraphrase"}
+{"text": "cho tôi hủy đơn hàng với", "intent": "cancel_order", "split": "test", "source": "paraphrase"}
+{"text": "không muốn nhận nữa", "intent": "cancel_order", "split": "train", "source": "paraphrase"}
+{"text": "đơn này tôi không lấy", "intent": "cancel_order", "split": "train", "source": "paraphrase"}
+{"text": "hủy đơn DH666 đi", "intent": "cancel_order", "split": "train", "source": "paraphrase"}
+{"text": "tôi đổi ý, hủy đơn thôi", "intent": "cancel_order", "split": "train", "source": "paraphrase"}
+{"text": "huy don DH1234", "intent": "cancel_order", "split": "train", "source": "paraphrase"}
+{"text": "khong lay nua", "intent": "cancel_order", "split": "test", "source": "paraphrase"}
+{"text": "huy don giup minh", "intent": "cancel_order", "split": "train", "source": "paraphrase"}
+{"text": "toi muon huy don nay", "intent": "cancel_order", "split": "train", "source": "paraphrase"}
+{"text": "cho tôi hủy đơn hàng DH888 tôi đặt nhầm mà", "intent": "cancel_order", "split": "train", "source": "paraphrase"}
+{"text": "giao hàng mất bao lâu", "intent": "check_policy", "split": "train", "source": "paraphrase"}
+{"text": "đổi trả trong bao lâu", "intent": "check_policy", "split": "test", "source": "paraphrase"}
+{"text": "thanh toán bằng thẻ được không", "intent": "check_policy", "split": "train", "source": "paraphrase"}
+{"text": "có được đổi sản phẩm không", "intent": "check_policy", "split": "test", "source": "paraphrase"}
+{"text": "chính sách đổi trả ra sao", "intent": "check_policy", "split": "train", "source": "paraphrase"}
+{"text": "hàng lỗi thì xử lý thế nào", "intent": "check_policy", "split": "train", "source": "paraphrase"}
+{"text": "shop có bảo hành không", "intent": "check_policy", "split": "train", "source": "paraphrase"}
+{"text": "trả hàng cần mang theo gì", "intent": "check_policy", "split": "train", "source": "paraphrase"}
+{"text": "phí vận chuyển bao nhiêu", "intent": "check_policy", "split": "test", "source": "paraphrase"}
+{"text": "mua online có được không", "intent": "check_policy", "split": "train", "source": "paraphrase"}
+{"text": "ship bao lau", "intent": "check_policy", "split": "train", "source": "paraphrase"}
+{"text": "doi tra the nao", "intent": "check_policy", "split": "test", "source": "paraphrase"}
+{"text": "thanh toan cod duoc khong", "intent": "check_policy", "split": "train", "source": "paraphrase"}
+{"text": "ship bn lau", "intent": "check_policy", "split": "test", "source": "paraphrase"}
+{"text": "co doi tra khong", "intent": "check_policy", "split": "train", "source": "paraphrase"}
+{"text": "cho tôi hỏi chính sách đổi trả của shop áp dụng thế nào ạ", "intent": "check_policy", "split": "train", "source": "paraphrase"}
+{"text": "áo này có đánh giá tốt không", "intent": "review_query", "split": "test", "source": "paraphrase"}
+{"text": "xem nhận xét của khách về sản phẩm này", "intent": "review_query", "split": "train", "source": "paraphrase"}
+{"text": "mọi người thấy chiếc váy này thế nào", "intent": "review_query", "split": "train", "source": "paraphrase"}
+{"text": "có ai đã mua chưa, đánh giá sao", "intent": "review_query", "split": "train", "source": "paraphrase"}
+{"text": "mình muốn xem review", "intent": "review_query", "split": "train", "source": "paraphrase"}
+{"text": "sản phẩm này chất lượng ra sao", "intent": "review_query", "split": "train", "source": "paraphrase"}
+{"text": "cho tôi xem đánh giá của khách", "intent": "review_query", "split": "train", "source": "paraphrase"}
+{"text": "co ai danh gia chua", "intent": "review_query", "split": "train", "source": "paraphrase"}
+{"text": "xem review vai do", "intent": "review_query", "split": "train", "source": "paraphrase"}
+{"text": "sp nay danh gia nhu the nao", "intent": "review_query", "split": "train", "source": "paraphrase"}
+{"text": "review co tot khong", "intent": "review_query", "split": "train", "source": "paraphrase"}
+{"text": "cho tôi xem đánh giá của những khách hàng đã mua chiếc áo khoác này", "intent": "review_query", "split": "train", "source": "paraphrase"}
+{"text": "tôi muốn phản ánh về đơn hàng", "intent": "complaint", "split": "train", "source": "paraphrase"}
+{"text": "hàng tôi nhận bị sai size", "intent": "complaint", "split": "train", "source": "paraphrase"}
+{"text": "sản phẩm không đúng mô tả", "intent": "complaint", "split": "train", "source": "paraphrase"}
+{"text": "giao chậm quá, tôi không hài lòng", "intent": "complaint", "split": "test", "source": "paraphrase"}
+{"text": "tôi cần khiếu nại về chất lượng", "intent": "complaint", "split": "train", "source": "paraphrase"}
+{"text": "vải của áo bị xùa", "intent": "complaint", "split": "train", "source": "paraphrase"}
+{"text": "đơn hàng chưa tới mà đã hủy", "intent": "complaint", "split": "train", "source": "paraphrase"}
+{"text": "nhân viên trả lời không vui", "intent": "complaint", "split": "train", "source": "paraphrase"}
+{"text": "ao bi loi", "intent": "complaint", "split": "train", "source": "paraphrase"}
+{"text": "giao sai hang", "intent": "complaint", "split": "test", "source": "paraphrase"}
+{"text": "sp loi giup minh", "intent": "complaint", "split": "train", "source": "paraphrase"}
+{"text": "khieu nai don hang", "intent": "complaint", "split": "train", "source": "paraphrase"}
+{"text": "tôi muốn khiếu nại về chiếc quần tôi mua tuần trước bị lỗi chất liệu", "intent": "complaint", "split": "train", "source": "paraphrase"}
+{"text": "cho tôi nói chuyện với nhân viên", "intent": "human_handoff", "split": "train", "source": "paraphrase"}
+{"text": "tôi cần gặp người tư vấn", "intent": "human_handoff", "split": "test", "source": "paraphrase"}
+{"text": "có thể kết nối với nhân viên không", "intent": "human_handoff", "split": "train", "source": "paraphrase"}
+{"text": "tư vấn giúp tôi với người thật", "intent": "human_handoff", "split": "train", "source": "paraphrase"}
+{"text": "ai đang trực tuyến", "intent": "human_handoff", "split": "train", "source": "paraphrase"}
+{"text": "tôi muốn nói chuyện với admin", "intent": "human_handoff", "split": "test", "source": "paraphrase"}
+{"text": "chuyển tôi sang nhân viên", "intent": "human_handoff", "split": "train", "source": "paraphrase"}
+{"text": "gap nhan vien", "intent": "human_handoff", "split": "train", "source": "paraphrase"}
+{"text": "cho gap nguoi that", "intent": "human_handoff", "split": "train", "source": "paraphrase"}
+{"text": "co ai ko shop", "intent": "human_handoff", "split": "train", "source": "paraphrase"}
+{"text": "toi muon noi chuyen voi nhan vien", "intent": "human_handoff", "split": "train", "source": "paraphrase"}
+{"text": "cho tôi liên hệ trực tiếp với nhân viên tư vấn được không", "intent": "human_handoff", "split": "test", "source": "paraphrase"}
+{"text": "hello", "intent": "greeting", "split": "test", "source": "paraphrase"}
+{"text": "hi shop", "intent": "greeting", "split": "train", "source": "paraphrase"}
+{"text": "chào bạn", "intent": "greeting", "split": "train", "source": "paraphrase"}
+{"text": "xin chào", "intent": "greeting", "split": "train", "source": "paraphrase"}
+{"text": "hey", "intent": "greeting", "split": "train", "source": "paraphrase"}
+{"text": "chào buổi sáng", "intent": "greeting", "split": "train", "source": "paraphrase"}
+{"text": "chào buổi chiều", "intent": "greeting", "split": "train", "source": "paraphrase"}
+{"text": "alo shop ơi", "intent": "greeting", "split": "test", "source": "paraphrase"}
+{"text": "chao shop", "intent": "greeting", "split": "train", "source": "paraphrase"}
+{"text": "xin chao", "intent": "greeting", "split": "train", "source": "paraphrase"}
+{"text": "hey shop", "intent": "greeting", "split": "train", "source": "paraphrase"}
+{"text": "oi shop", "intent": "greeting", "split": "train", "source": "paraphrase"}
+{"text": "bye", "intent": "goodbye", "split": "test", "source": "paraphrase"}
+{"text": "tạm biệt", "intent": "goodbye", "split": "train", "source": "paraphrase"}
+{"text": "hẹn gặp lại", "intent": "goodbye", "split": "train", "source": "paraphrase"}
+{"text": "chào bạn", "intent": "goodbye", "split": "train", "source": "paraphrase"}
+{"text": "tôi đi đây", "intent": "goodbye", "split": "train", "source": "paraphrase"}
+{"text": "gặp lại nhé", "intent": "goodbye", "split": "train", "source": "paraphrase"}
+{"text": "tam biet", "intent": "goodbye", "split": "train", "source": "paraphrase"}
+{"text": "hen gap lai", "intent": "goodbye", "split": "train", "source": "paraphrase"}
+{"text": "bye shop", "intent": "goodbye", "split": "train", "source": "paraphrase"}
+{"text": "toi di day", "intent": "goodbye", "split": "test", "source": "paraphrase"}
+{"text": "cảm ơn shop", "intent": "thanks", "split": "train", "source": "paraphrase"}
+{"text": "thanks", "intent": "thanks", "split": "train", "source": "paraphrase"}
+{"text": "cảm ơn bạn nhiều", "intent": "thanks", "split": "train", "source": "paraphrase"}
+{"text": "cảm ơn nha", "intent": "thanks", "split": "train", "source": "paraphrase"}
+{"text": "đa tạ", "intent": "thanks", "split": "train", "source": "paraphrase"}
+{"text": "cảm ơn vì đã tư vấn", "intent": "thanks", "split": "test", "source": "paraphrase"}
+{"text": "cam on", "intent": "thanks", "split": "train", "source": "paraphrase"}
+{"text": "cam on shop nhieu", "intent": "thanks", "split": "train", "source": "paraphrase"}
+{"text": "thanks a", "intent": "thanks", "split": "train", "source": "paraphrase"}
+{"text": "cam on nha", "intent": "thanks", "split": "test", "source": "paraphrase"}
+{"text": "hôm nay trời lạnh không", "intent": "out_of_scope", "split": "train", "source": "paraphrase"}
+{"text": "giải giúp tôi bài toán 2x + 3 = 7", "intent": "out_of_scope", "split": "train", "source": "paraphrase"}
+{"text": "tổng thống Mỹ hiện tại là ai", "intent": "out_of_scope", "split": "train", "source": "paraphrase"}
+{"text": "kể tôi nghe chuyện cười", "intent": "out_of_scope", "split": "train", "source": "paraphrase"}
+{"text": "dịch giúp tôi câu này", "intent": "out_of_scope", "split": "train", "source": "paraphrase"}
+{"text": "lập trình python đọc file thế nào", "intent": "out_of_scope", "split": "train", "source": "paraphrase"}
+{"text": "trận bóng tối qua có ai thắng", "intent": "out_of_scope", "split": "train", "source": "paraphrase"}
+{"text": "chứng khoán đang tăng hay giảm", "intent": "out_of_scope", "split": "train", "source": "paraphrase"}
+{"text": "bầu cử president ra sao", "intent": "out_of_scope", "split": "train", "source": "paraphrase"}
+{"text": "hướng dẫn tôi mổ tim", "intent": "out_of_scope", "split": "train", "source": "paraphrase"}
+{"text": "bệnh viêm phổi điều trị thế nào", "intent": "out_of_scope", "split": "test", "source": "paraphrase"}
+{"text": "luật giao dịch dân sự quy định gì", "intent": "out_of_scope", "split": "train", "source": "paraphrase"}
+{"text": "thoi tiet hom nay", "intent": "out_of_scope", "split": "train", "source": "paraphrase"}
+{"text": "gia chung khoan", "intent": "out_of_scope", "split": "train", "source": "paraphrase"}
+{"text": "giai phuong trinh giup", "intent": "out_of_scope", "split": "train", "source": "paraphrase"}
+{"text": "ke chuyen cuoi", "intent": "out_of_scope", "split": "train", "source": "paraphrase"}
+{"text": "theo bạn thị trường chứng khoán Việt Nam tuần này sẽ ra sao", "intent": "out_of_scope", "split": "test", "source": "paraphrase"}
+{"text": "à", "intent": "unclear", "split": "train", "source": "paraphrase"}
+{"text": "ừ", "intent": "unclear", "split": "train", "source": "paraphrase"}
+{"text": "hả", "intent": "unclear", "split": "train", "source": "paraphrase"}
+{"text": "gì", "intent": "unclear", "split": "test", "source": "paraphrase"}
+{"text": "kìa", "intent": "unclear", "split": "train", "source": "paraphrase"}
+{"text": "hm", "intent": "unclear", "split": "test", "source": "paraphrase"}
+{"text": "ha", "intent": "unclear", "split": "test", "source": "paraphrase"}
+{"text": "vậy", "intent": "unclear", "split": "train", "source": "paraphrase"}
+{"text": "thế", "intent": "unclear", "split": "train", "source": "paraphrase"}
+{"text": "ơi", "intent": "unclear", "split": "train", "source": "paraphrase"}
+{"text": "ê", "intent": "unclear", "split": "test", "source": "paraphrase"}
+{"text": "chờ đợi", "intent": "unclear", "split": "train", "source": "paraphrase"}

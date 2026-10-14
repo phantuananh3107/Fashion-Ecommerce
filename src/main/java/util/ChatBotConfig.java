@@ -9,21 +9,40 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * ChatBotConfig - Quản lý cấu hình ChatBot từ file .env
+ * ChatBotConfig — Quản lý cấu hình ChatBot (kiến trúc 3 tầng local).
+ *
+ * Trước đây gọi Gemini cloud. Nay FastAPI local :8000 (chatbot-service/app/main.py)
+ * là runtime duy nhất. Không cần API key cloud.
+ *
+ * Thứ tự đọc cấu hình (ưu tiên cao → thấp):
+ *   1. System property -Dchatbot.*  (ví dụ: -Dchatbot.api.url=http://...).
+ *   2. File .env ở working directory.
+ *   3. Classpath resource ".env".
+ *   4. Giá trị mặc định hard-coded dưới đây.
+ *
+ * Biến môi trường / .env dùng được:
+ *   CHATBOT_API_URL   — URL đầy đủ tới /api/chat (ví dụ http://localhost:8000/api/chat)
+ *   CHATBOT_TIMEOUT_MS — timeout đọc (ms), mặc định 65000 để tier3 kịp trả lời
+ *   CHATBOT_CONNECT_MS — timeout kết nối (ms), mặc định 5000
+ *   GEMINI_API_KEY    — giữ lại để tương thích .env cũ (bị bỏ qua, không đọc nữa)
  */
 public class ChatBotConfig {
 
     private static final Map<String, String> envProperties = loadEnv();
 
-    public static final String GEMINI_API_KEY = getEnv("GEMINI_API_KEY", "AIzaSyAdQzszvoqk9Zq1aYUi11uamogONVdBQOE");
-    public static final String CHATBOT_MODEL = "gemini-2.5-flash";
-    public static final double CHATBOT_TEMPERATURE =
-            Double.parseDouble(getEnv("CHATBOT_TEMPERATURE", "0.7"));
-    public static final int CHATBOT_MAX_TOKENS =
-            Integer.parseInt(getEnv("CHATBOT_MAX_TOKENS", "2048"));
+    // FastAPI chatbot local — chỉnh trong .env nếu port khác 8000
+    public static final String CHAT_API_URL = getConfig("CHATBOT_API_URL", "http://localhost:8000/api/chat");
 
-    // ĐÃ CẬP NHẬT: Đường dẫn chuẩn cho mô hình Gemini v1beta
-    public static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/" + CHATBOT_MODEL + ":generateContent";
+    public static final int CHATBOT_CONNECT_TIMEOUT_MS = Integer.parseInt(
+            getConfig("CHATBOT_CONNECT_MS", "5000"));
+    public static final int CHATBOT_READ_TIMEOUT_MS = Integer.parseInt(
+            getConfig("CHATBOT_TIMEOUT_MS", "65000"));
+
+    // Gemini cloud đã loại bỏ. Giữ các hằng dưới đây chỉ để file .env cũ không báo lỗi
+    // khi ChatBotService cũ chưa được HotSwap (tránh parse Double với key cũ)
+    @Deprecated public static final String CHATBOT_MODEL = "qwen2.5:7b-instruct-q4_K_M";
+    @Deprecated public static final double CHATBOT_TEMPERATURE = 0.2;
+    @Deprecated public static final int CHATBOT_MAX_TOKENS = 512;
 
     public static final String SYSTEM_PROMPT = """
         Bạn là một trợ lý bán hàng AI chuyên nghiệp cho cửa hàng thời trang TA shop.
@@ -44,6 +63,23 @@ public class ChatBotConfig {
         ...
         Hãy xem ảnh chi tiết và kiểm tra size trước khi mua!"
         """;
+
+    /**
+     * Đọc cấu hình theo thứ tự: System property → biến môi trường → .env → mặc định.
+     * Dùng cho tên key không chấp nhấn dấu gạch dưới, ví dụ CHATBOT_API_URL → chatbot.api.url.
+     */
+    private static String getConfig(String key, String defaultValue) {
+        String prop = System.getProperty(key.toLowerCase().replace('_', '.'));
+        if (prop != null && !prop.isEmpty()) return prop.trim();
+
+        String env = System.getenv(key);
+        if (env != null && !env.isEmpty()) return env.trim();
+
+        String fromFile = envProperties.get(key);
+        if (fromFile != null && !fromFile.isEmpty()) return fromFile.trim();
+
+        return defaultValue;
+    }
 
     private static Map<String, String> loadEnv() {
         Map<String, String> properties = new HashMap<>();
@@ -80,16 +116,14 @@ public class ChatBotConfig {
         }
     }
 
-    private static String getEnv(String key, String defaultValue) {
-        String value = envProperties.get(key);
-        return (value == null || value.isEmpty()) ? defaultValue : value;
-    }
-
     public static boolean isConfigured() {
-        return GEMINI_API_KEY != null && !GEMINI_API_KEY.isEmpty();
+        return CHAT_API_URL != null && !CHAT_API_URL.isEmpty();
     }
 
-    public static String getApiKey() {
-        return GEMINI_API_KEY;
+    /**
+     * URL tới FastAPI /api/chat — điểm cấu hình duy nhất của toàn bộ hệ chatbot.
+     */
+    public static String getChatApiUrl() {
+        return CHAT_API_URL;
     }
 }

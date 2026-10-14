@@ -1,0 +1,13 @@
+{
+  "rule_high": 0.92,
+  "rule_low": 0.30,
+  "tau": 0.72,
+  "match_mode": "centroid",
+  "accuracy_test": 0.913,
+  "accuracy_all": 0.916,
+  "tier3_ratio_test": 0.0,
+  "tier3_ratio_all": 0.0,
+  "split": "test",
+  "n": 46,
+  "note": "Ngưỡng cuối cùng sau khi chuyển sang kiến trúc JEV-primary + sửa RULE_TRUSTED_INTENTS (bỏ 'unclear'). Rule chỉ short-circuit intent có regex độc lập (track_order/cancel_order/greeting/thanks/goodbye/out_of_scope). JEV là bộ phân loại chính. Tier3 (LLM) chỉ khi JEV mơ hồ VÀ Rule không đồng ý. Hybrid đạt 91.3% test / 91.6% toàn bộ."
+}

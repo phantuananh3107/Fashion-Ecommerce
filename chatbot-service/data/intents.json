@@ -1,0 +1,182 @@
+{
+  "version": "1.0",
+  "language": "vi",
+  "intents": [
+    {
+      "name": "greeting",
+      "priority": 3,
+      "keywords": ["xin chào", "chào shop", "chào bạn", "hello", "hi", "hey", "alo"],
+      "patterns": ["^(xin chao|chao|hello|hi|hey|alo)[\\s!.,]*$"],
+      "entities": [],
+      "tool": null,
+      "response_template": "Xin chào! Mình có thể giúp bạn tìm sản phẩm, tra đơn hàng, hoặc giải đáp chính sách. Bạn cần gì ạ?"
+    },
+    {
+      "name": "goodbye",
+      "priority": 3,
+      "keywords": ["tạm biệt", "bye", "hẹn gặp lại", "chào tạm biệt"],
+      "patterns": ["(tam biet|hen gap lai|bye)"],
+      "entities": [],
+      "tool": null,
+      "response_template": "Cảm ơn bạn đã ghé shop! Hẹn gặp lại ạ."
+    },
+    {
+      "name": "thanks",
+      "priority": 3,
+      "keywords": ["cảm ơn", "cam on", "thanks", "thank you", "cám ơn"],
+      "patterns": ["(cam on|cảm ơn|thanks)"],
+      "entities": [],
+      "tool": null,
+      "response_template": "Không có gì ạ! Cần gì thêm cứ nhắn mình nhé."
+    },
+    {
+      "name": "find_product",
+      "priority": 1,
+      "keywords": ["tìm", "tim", "xem", "có", "muốn mua", "cho xem", "giới thiệu", "áo", "quần", "váy", "đầm", "giày", "túi", "phụ kiện", "set đồ", "đồ", "sản phẩm", "hoodie", "sơ mi", "jean", "short", "crop", "maxi", "len", "khoác", "nam", "nữ", "trẻ em", "mới"],
+      "patterns": ["(tim|xem|co|muon mua|cho xem|gioi thieu).*(ao|quan|vay|dam|giay|tui|hoodie|so mi|jean)", "(\\bao|\\bquan\\b|\\bvay\\b|\\bdam\\b|\\bgiay\\b|\\btui\\b|\\bhoodie\\b)"],
+      "entities": ["keyword", "category", "color", "size", "price_range"],
+      "tool": "search_products",
+      "required_entities": [],
+      "response_template": null
+    },
+    {
+      "name": "check_availability",
+      "priority": 1,
+      "keywords": ["còn hàng", "con hang", "còn không", "con khong", "còn size", "còn màu", "hết hàng"],
+      "patterns": ["(con hang|con khong|het hang|con size|con mau)"],
+      "entities": ["product_name", "size", "color"],
+      "tool": "check_stock",
+      "required_entities": [],
+      "response_template": null
+    },
+    {
+      "name": "price_query",
+      "priority": 2,
+      "keywords": ["giá bao nhiêu", "gia bao nhieu", "bao nhiêu tiền", "giá", "gia"],
+      "patterns": ["(gia bao nhieu|bao nhieu tien|gia .*bao nhieu)"],
+      "entities": ["product_name"],
+      "tool": "search_products",
+      "required_entities": [],
+      "response_template": null
+    },
+    {
+      "name": "promotion_query",
+      "priority": 2,
+      "keywords": ["khuyến mãi", "khuyen mai", "giảm giá", "giam gia", "voucher", "mã giảm", "ma giam", "freeship", "free ship", "sale"],
+      "patterns": ["(khuyen mai|giam gia|voucher|ma giam|freeship|sale)"],
+      "entities": [],
+      "tool": "lookup_faq",
+      "tool_args": {"topic": "promotion"},
+      "response_template": null
+    },
+    {
+      "name": "size_guide",
+      "priority": 2,
+      "keywords": ["bảng size", "bang size", "tư vấn size", "tu van size", "mặc size gì", "size gì", "bao nhiêu kg"],
+      "patterns": ["(bang size|tu van size|mac size|bao nhieu kg)"],
+      "entities": ["size"],
+      "tool": "lookup_faq",
+      "tool_args": {"topic": "size_guide"},
+      "response_template": null
+    },
+    {
+      "name": "track_order",
+      "priority": 1,
+      "keywords": ["đơn hàng", "don hang", "tra đơn", "kiểm tra đơn", "kiem tra don", "đơn", "giao hàng", "vận chuyển", "van chuyen"],
+      "patterns": ["(don hang|tra don|kiem tra don|ma don)", "DH\\d{3,}", "\\b0\\d{9,10}\\b"],
+      "entities": ["order_code", "phone"],
+      "tool": "get_order",
+      "required_entities": ["order_code"],
+      "ask_missing": "Bạn cho mình mã đơn hàng (ví dụ DH1234) hoặc số điện thoại đặt hàng nhé.",
+      "response_template": null
+    },
+    {
+      "name": "cancel_order",
+      "priority": 1,
+      "keywords": ["hủy đơn", "huy don", "không lấy", "khong lay", "hủy hàng"],
+      "patterns": ["(huy don|khong lay|huy hang)"],
+      "entities": ["order_code"],
+      "tool": "cancel_order",
+      "required_entities": ["order_code"],
+      "ask_missing": "Bạn cho mình mã đơn cần hủy nhé.",
+      "response_template": null
+    },
+    {
+      "name": "check_policy",
+      "priority": 2,
+      "keywords": ["chính sách", "chinh sach", "đổi trả", "doi tra", "trả hàng", "tra hang", "ship", "vận chuyển", "van chuyen", "thanh toán", "thanh toan", "cod", "bảo hành", "bao hanh"],
+      "patterns": ["(chinh sach|doi tra|van chuyen|thanh toan|bao hanh|ship)"],
+      "entities": ["topic"],
+      "tool": "lookup_faq",
+      "required_entities": [],
+      "response_template": null
+    },
+    {
+      "name": "review_query",
+      "priority": 2,
+      "keywords": ["đánh giá", "danh gia", "review", "nhận xét", "nhan xet", "có tốt không", "co tot khong", "tốt không", "tot khong"],
+      "patterns": ["(danh gia|review|nhan xet|co tot khong)"],
+      "entities": ["product_name"],
+      "tool": "get_reviews",
+      "required_entities": [],
+      "response_template": null
+    },
+    {
+      "name": "complaint",
+      "priority": 1,
+      "keywords": ["khiếu nại", "khieu nai", "bị lỗi", "bi loi", "giao sai", "chất lượng kém", "chat luong kem", "hàng lỗi", "hang loi", "phàn nàn", "phan nan"],
+      "patterns": ["(khieu nai|bi loi|giao sai|phan nan|hang loi)"],
+      "entities": [],
+      "tool": "create_ticket",
+      "response_template": "Mình rất tiếc về trải nghiệm chưa tốt. Bạn mô tả rõ vấn đề (mã đơn + ảnh nếu có) để mình chuyển bộ phận xử lý nhé."
+    },
+    {
+      "name": "human_handoff",
+      "priority": 1,
+      "keywords": ["gặp nhân viên", "gap nhan vien", "người thật", "nguoi that", "có ai không", "co ai khong", "nhân viên", "nhan vien", "tư vấn viên"],
+      "patterns": ["(gap nhan vien|nguoi that|co ai khong|nhan vien)"],
+      "entities": [],
+      "tool": null,
+      "response_template": "Mình đã ghi nhận yêu cầu gặp nhân viên. Bạn để lại số điện thoại, nhân viên sẽ liên hệ trong giờ hành chính nhé."
+    },
+    {
+      "name": "out_of_scope",
+      "priority": 0,
+      "keywords": ["thời tiết", "thoi tiet", "tổng thống", "tong thong", "phương trình", "phuong trinh", "viết code", "viet code", "dịch sang", "dich sang", "đá bóng", "da bong", "chứng khoán", "chung khoan"],
+      "patterns": ["(thoi tiet|tong thong|phuong trinh|viet code|dich sang|da bong|chung khoan|ai la)"],
+      "entities": [],
+      "tool": null,
+      "response_template": "Câu hỏi này nằm ngoài phạm vi tư vấn thời trang của mình. Mình có thể giúp bạn: 1) Tìm sản phẩm, 2) Tra cứu đơn hàng, 3) Giải đáp chính sách ship/đổi trả. Bạn cần gì ạ?"
+    },
+    {
+      "name": "unclear",
+      "priority": 0,
+      "keywords": [],
+      "patterns": ["^.{0,2}$", "^\\?+$", "^\\.+$"],
+      "entities": [],
+      "tool": null,
+      "response_template": "Mình chưa hiểu rõ ý bạn. Bạn muốn tìm sản phẩm, tra đơn hàng, hay hỏi về chính sách ạ?"
+    }
+  ],
+  "entity_patterns": {
+    "order_code": "DH\\d{3,}|\\b\\d{10,11}\\b",
+    "phone": "\\b0\\d{9,10}\\b",
+    "size": "\\b(XXS|XS|S|M|L|XL|XXL|2XL|3XL|28|29|30|31|32|34|36|38|40|42)\\b",
+    "color": "\\b(đỏ|den|đen|trắng|trang|xanh|vàng|vang|hồng|hong|tím|tim|nâu|nau|be|kem|xám|xam)\\b",
+    "price_range": "(dưới|duoi|tren|trên|từ|tu).*\\d+[kK]?",
+    "keyword": "(áo thun|áo sơ mi|áo khoác|quần jean|quần short|váy|đầm|hoodie|crop top|maxi|áo len|set đồ|giày|túi)"
+  },
+  "out_of_scope_keywords": ["thời tiết", "thoi tiet", "tổng thống", "tong thong", "phương trình", "phuong trinh", "viết code", "viet code", "dịch sang", "dich sang", "dịch", "dich", "đá bóng", "da bong", "chứng khoán", "chung khoan", "bầu cử", "bau cu", "chính trị", "chinh tri", "y tế", "y te", "luật", "kể chuyện", "ke chuyen", "chuyện cười", "chuyen cuoi", "truyện cười", "truyen cuoi", "mổ", "bệnh", "benh", "thuốc", "thuoc", "khám", "kham"],
+  "teencode_map": {
+    "ko": "không",
+    "k": "không",
+    "dc": "được",
+    "đc": "được",
+    "vs": "với",
+    "sp": "sản phẩm",
+    "ad": "admin",
+    "shop": "shop",
+    "mk": "mình",
+    "b": "bạn"
+  }
+}

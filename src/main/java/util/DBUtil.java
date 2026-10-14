@@ -9,10 +9,10 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 public class DBUtil {
     public static final String HOST_NAME = "localhost";
-    public static final String DB_NAME = "fashionecom";
+    public static final String DB_NAME = System.getenv("DB_NAME") != null ?System.getenv("DB_NAME") : "fashionecom";
     public static final String DB_PORT = "3306";
-    public static final String USER_NAME = "root";
-    public static final String PASSWORD = "123456";
+    public static final String USER_NAME = System.getenv("DB_USER") != null ?System.getenv("DB_USER") : "root";
+    public static final String PASSWORD = System.getenv("DB_PASS") != null ?System.getenv("DB_PASS") : "123456";
     public static final String DB_DRIVER = "com.mysql.cj.jdbc.Driver";
     public static final int DB_MIN_CONNECTIONS = 2;
     public static final int DB_MAX_CONNECTIONS = 4;
