@@ -4,6 +4,7 @@
  * Lưu lịch sử chat vào sessionStorage (Reset khi đóng trình duyệt)
  */
 
+$(document).ready(function () {
 
     // ===== BIẾN TOÀN CỤC =====
     const $chatWidget = $('#chatbot-widget');
@@ -22,18 +23,21 @@
     loadChatHistory();
 
     // ===== EVENT: Click nút Toggle (Mở/Đóng ChatBot) =====
+    $toggleBtn.on('click', function () {
         $chatWidget.addClass('active');
         $toggleBtn.addClass('hidden');
         $input.focus();
     });
 
     // ===== EVENT: Click nút Close (Đóng ChatBot) =====
+    $closeBtn.on('click', function () {
         $chatWidget.removeClass('active');
         $toggleBtn.removeClass('hidden');
     });
 
     // ===== EVENT: Click nút Send hoặc nhấn Enter =====
     $sendBtn.on('click', sendMessage);
+    $input.on('keypress', function (e) {
         if (e.which === 13) {
             sendMessage();
         }
@@ -47,9 +51,11 @@
             if (savedHistory) {
                 const messages = JSON.parse(savedHistory);
                 $messagesContainer.empty();
+                messages.forEach(function (msg) {
                     appendMessage(msg.text, msg.sender, false);
                 });
             }
+        } catch (e) {
             console.error('Error loading chat history:', e);
         }
     }
@@ -58,6 +64,7 @@
     function saveChatHistory() {
         try {
             const messages = [];
+            $messagesContainer.find('.chatbot-message').each(function () {
                 const $bubble = $(this).find('.message-bubble');
                 const text = $bubble.text();
                 const sender = $(this).hasClass('user-message') ? 'user' : 'bot';
@@ -68,6 +75,7 @@
             });
             // ĐÃ SỬA: Dùng sessionStorage
             sessionStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
+        } catch (e) {
             console.error('Error saving chat history:', e);
         }
     }
@@ -77,11 +85,13 @@
         try {
             // ĐÃ SỬA: Dùng sessionStorage
             sessionStorage.removeItem(CHAT_HISTORY_KEY);
+        } catch (e) {
             console.error('Error clearing chat history:', e);
         }
     }
 
     // ===== PUBLIC FUNCTION: Xóa chat history khi logout =====
+    window.clearChatHistoryOnLogout = function () {
         clearChatHistory();
     };
 
@@ -98,7 +108,6 @@
         $input.val('');
         showLoading();
 
-        var contextPath = $('meta[name="contextPath"]').attr('content') || '/jsp-servlet';
         var rawContextPath = $('meta[name="contextPath"]').attr('content');
         var contextPath = (typeof rawContextPath !== 'undefined') ? rawContextPath : '/jsp-servlet';
 
@@ -108,6 +117,7 @@
             data: { message: message },
             dataType: 'json',
             timeout: 30000,
+            success: function (response) {
                 removeLoading();
                 if (response.success) {
                     appendMessage(response.message, 'bot');
@@ -116,6 +126,7 @@
                 }
                 saveChatHistory();
             },
+            error: function (xhr, status, error) {
                 removeLoading();
                 var errorMsg = '❌ Lỗi kết nối';
                 if (status === 'timeout') {
