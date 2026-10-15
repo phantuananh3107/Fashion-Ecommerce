@@ -45,11 +45,15 @@
                 <c:when test="${order.paymentMethod == 'COD' || order.paymentMethod == 'cod'}">
                   <input type="text" id="paymentMethod" name="paymentMethod" value="Tiền mặt (COD)" readonly/>
                 </c:when>
+                <c:when test="${order.paymentMethod == 'SEPAY' || order.paymentMethod == 'sepay'}">
+                  <input type="text" id="paymentMethod" name="paymentMethod" value="Chuyển khoản QR (SePay)" readonly/>
+                </c:when>
+                <%-- Nhãn dự phòng cho dữ liệu cũ: hiển thị bình thường, không lỗi --%>
                 <c:when test="${order.paymentMethod == 'VNPAY' || order.paymentMethod == 'vnpay'}">
-                  <input type="text" id="paymentMethod" name="paymentMethod" value="VNPAY / Thẻ ATM" readonly/>
+                  <input type="text" id="paymentMethod" name="paymentMethod" value="VNPAY / Thẻ ATM (cũ)" readonly/>
                 </c:when>
                 <c:when test="${order.paymentMethod == 'MOMO' || order.paymentMethod == 'momo'}">
-                  <input type="text" id="paymentMethod" name="paymentMethod" value="Ví MoMo" readonly/>
+                  <input type="text" id="paymentMethod" name="paymentMethod" value="Ví MoMo (cũ)" readonly/>
                 </c:when>
                 <c:otherwise>
                   <input type="text" id="paymentMethod" name="paymentMethod" value="${order.paymentMethod}" readonly/>
@@ -59,9 +63,13 @@
             <div class="inner-group">
               <label class="inner-label" for="statusPay">Trạng thái thanh toán</label>
               <select name="paymentStatus" id="statusPay">
-                <option ${order.paymentStatus == 'Đã thanh toán (VNPAY)' ? 'selected="selected"' : ''} value="Đã thanh toán (VNPAY)">Đã thanh toán (VNPAY)</option>
                 <option ${order.paymentStatus == 'Chưa thanh toán' ? 'selected="selected"' : ''} value="Chưa thanh toán">Chưa thanh toán</option>
                 <option ${order.paymentStatus == 'Chờ thanh toán online' ? 'selected="selected"' : ''} value="Chờ thanh toán online">Chờ thanh toán online</option>
+                <option ${order.paymentStatus == 'Đã thanh toán (SePay)' ? 'selected="selected"' : ''} value="Đã thanh toán (SePay)">Đã thanh toán (SePay)</option>
+                <option ${order.paymentStatus == 'Hết hạn (SePay)' ? 'selected="selected"' : ''} value="Hết hạn (SePay)">Hết hạn (SePay)</option>
+                <option ${order.paymentStatus == 'Đã thanh toán sau hạn - cần kiểm tra' ? 'selected="selected"' : ''} value="Đã thanh toán sau hạn - cần kiểm tra" style="color:#ff6b00;font-weight:bold;">⚠ Thanh toán sau hạn - cần kiểm tra</option>
+                <%-- Giữ tương thích dữ liệu cũ --%>
+                <option ${order.paymentStatus == 'Đã thanh toán (VNPAY)' ? 'selected="selected"' : ''} value="Đã thanh toán (VNPAY)">Đã thanh toán (VNPAY) (cũ)</option>
               </select>
             </div>
             <div class="inner-group">

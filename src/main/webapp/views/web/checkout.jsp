@@ -59,12 +59,8 @@
                             <span class="payment-name">Thanh toán khi nhận hàng (COD)</span>
                         </label>
                         <label class="payment-method-item">
-                            <input type="radio" name="paymentMethod" value="VNPAY">
-                            <span class="payment-name">Thanh toán qua VNPAY / Thẻ ATM</span>
-                        </label>
-                        <label class="payment-method-item">
-                            <input type="radio" name="paymentMethod" value="MOMO">
-                            <span class="payment-name">Thanh toán qua Ví MoMo</span>
+                            <input type="radio" name="paymentMethod" value="SEPAY" id="pm-sepay">
+                            <span class="payment-name">Chuyển khoản QR (SePay) — quét mã, tự động xác nhận</span>
                         </label>
                     </div>
                 </div>
