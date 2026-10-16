@@ -20,8 +20,6 @@ import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * POST /api/sepay-webhook
@@ -41,10 +39,6 @@ public class SePayWebhookServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    /** Regex khớp cụm DH<số> với word-boundary để DH1 không khớp DH12 */
-    private static final Pattern PAYMENT_CODE_PATTERN =
-            Pattern.compile("(?<![\\w\\d])(DH\\d+)(?![\\d])", Pattern.CASE_INSENSITIVE);
-
     // ───────────────────────────────────────────────────────────────────────
     //  POST handler
     // ───────────────────────────────────────────────────────────────────────
@@ -57,7 +51,8 @@ public class SePayWebhookServlet extends HttpServlet {
         // ── 1. Xác thực Apikey bằng constant-time comparison ──────────────
         String authHeader = request.getHeader("Authorization");
         String expectedHeader = "Apikey " + SepayConfig.API_KEY;
-        if (!constantTimeEquals(authHeader, expectedHeader)) {
+        if (!SepayConfig.isWebhookConfigured()
+                || !constantTimeEquals(authHeader, expectedHeader)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             writeJson(response, false, "unauthorized");
             return;
@@ -108,7 +103,7 @@ public class SePayWebhookServlet extends HttpServlet {
         }
 
         // ── 4. Xác định mã đơn hàng ────────────────────────────────────────
-        String paymentCode = resolvePaymentCode(code, content);
+        String paymentCode = PaymentCodeResolver.resolve(code, content);
         if (paymentCode == null) {
             log("[SePay] Không xác định được mã đơn từ code='" + code
                     + "' content='" + content + "'. Ghi log, bỏ qua.");
@@ -132,56 +127,55 @@ public class SePayWebhookServlet extends HttpServlet {
             log("[SePay] Thiếu tiền cho đơn " + orderId
                     + ": nhận=" + transferAmt + " cần=" + order.getTotalAmount());
             // Ghi giao dịch nhưng KHÔNG đổi trạng thái
-            orderDAO.insertPaymentTransaction(orderId, sepayTxId, transferAmt, content, rawBody);
+            try {
+                orderDAO.insertPaymentTransaction(orderId, sepayTxId, transferAmt, content, rawBody);
+            } catch (Exception e) {
+                log("[SePay] Lỗi ghi giao dịch thiếu tiền: " + e.getMessage(), e);
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                writeJson(response, false, "internal_error");
+                return;
+            }
             writeSuccess(response);
             return;
         }
 
-        // ── 7. Chống trùng + update trong cùng 1 DB transaction ───────────
-        //    insertPaymentTransaction trả false nếu sepay_transaction_id đã tồn tại (UNIQUE)
-        boolean inserted = orderDAO.insertPaymentTransaction(orderId, sepayTxId, transferAmt, content, rawBody);
-        if (!inserted) {
+        OrderObject fullOrder = orderDAO.getOrderDetailByOrderId(orderId);
+        List<Integer> purchaseProductIds = new ArrayList<>();
+        if (fullOrder != null && fullOrder.getOrderDetailList() != null) {
+            for (OrderDetailObject detail : fullOrder.getOrderDetailList()) {
+                if (detail != null && detail.getProductObject() != null) {
+                    purchaseProductIds.add(detail.getProductObject().getProductId());
+                }
+            }
+        }
+
+        OrderDAO.PaymentTransactionResult result;
+        try {
+            result = orderDAO.processPaymentTransaction(order, sepayTxId, transferAmt,
+                    content, rawBody, new Timestamp(System.currentTimeMillis()),
+                    OrderStatus.PAY_PAID_SEPAY, OrderStatus.PAY_LATE_SEPAY);
+        } catch (Exception e) {
+            log("[SePay] Lỗi hệ thống khi xử lý txId=" + sepayTxId + ": " + e.getMessage(), e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            writeJson(response, false, "internal_error");
+            return;
+        }
+
+        if (result == OrderDAO.PaymentTransactionResult.DUPLICATE) {
             log("[SePay] Giao dịch trùng txId=" + sepayTxId + " cho đơn " + orderId + ". Bỏ qua.");
             writeSuccess(response);
             return;
         }
-
-        // ── 8. Cập nhật trạng thái đơn ────────────────────────────────────
-        Timestamp paidAt = new Timestamp(System.currentTimeMillis());
-        String currentStatus = order.getPaymentStatus();
-
-        if (OrderStatus.PAY_EXPIRED_SEPAY.equals(currentStatus)) {
-            // Tiền về SAU khi đơn đã hết hạn → đánh dấu đặc biệt, không trừ kho
-            boolean updated = orderDAO.markLatePayment(orderId, OrderStatus.PAY_LATE_SEPAY);
-            log("[SePay] Đơn " + orderId + " đã hết hạn nhưng tiền về. markLate=" + updated);
-
-        } else {
-            // Điều kiện: WHERE payment_status = 'Chờ thanh toán online'
-            int rows = orderDAO.markPaidConditional(orderId, OrderStatus.PAY_PAID_SEPAY, paidAt);
-            if (rows == 1) {
-                log("[SePay] Đơn " + orderId + " đã thanh toán thành công.");
-
-                // ── 9. Ghi PURCHASE behavior cho từng sản phẩm ────────────
-                Integer userId = order.getUserId();
-                if (userId != null && userId > 0) {
-                    // Reload order detail để có danh sách sản phẩm
-                    OrderObject fullOrder = orderDAO.getOrderDetailByOrderId(orderId);
-                    List<OrderDetailObject> details = fullOrder != null
-                            ? fullOrder.getOrderDetailList() : new ArrayList<>();
-                    for (OrderDetailObject d : details) {
-                        if (d != null && d.getProductObject() != null) {
-                            BehaviorTracker.trackPurchase(userId, null,
-                                    d.getProductObject().getProductId());
-                        }
-                    }
+        if (result == OrderDAO.PaymentTransactionResult.PROCESSED_WITH_PURCHASE_LOG) {
+            try {
+                for (Integer productId : purchaseProductIds) {
+                    BehaviorTracker.trackPurchase(order.getUserId(), null, productId);
                 }
-            } else {
-                // rows == 0: đơn đã được xử lý bởi luồng khác (expiration listener hoặc webhook trùng race-condition)
-                log("[SePay] Đơn " + orderId
-                        + " markPaidConditional=0 (đã xử lý trước đó). txId=" + sepayTxId);
+            } catch (Exception e) {
+                log("[SePay] Lỗi ghi PURCHASE log cho đơn " + orderId + ": " + e.getMessage(), e);
             }
         }
-
+        log("[SePay] Đã ghi nhận thanh toán cho đơn " + orderId + ".");
         writeSuccess(response);
     }
 
@@ -195,35 +189,6 @@ public class SePayWebhookServlet extends HttpServlet {
      *  2. Tìm trong `content` regex DH<số> với word-boundary
      *  Nếu content cho nhiều kết quả → log + trả null
      */
-    private String resolvePaymentCode(String code, String content) {
-        // Ưu tiên trường code
-        if (code != null && !code.trim().isEmpty()) {
-            return code.trim().toUpperCase();
-        }
-
-        // Tìm trong content
-        if (content == null || content.trim().isEmpty()) {
-            return null;
-        }
-
-        Matcher m = PAYMENT_CODE_PATTERN.matcher(content);
-        List<String> found = new ArrayList<>();
-        while (m.find()) {
-            String candidate = m.group(1).toUpperCase();
-            if (!found.contains(candidate)) {
-                found.add(candidate);
-            }
-        }
-
-        if (found.size() == 1) {
-            return found.get(0);
-        } else if (found.size() > 1) {
-            log("[SePay] Nhiều mã đơn trong content: " + found + " — content='" + content + "'. Không xử lý.");
-            return null;
-        }
-        return null;
-    }
-
     /**
      * So sánh constant-time để chống timing attack.
      */

@@ -55,6 +55,11 @@ public class ProcessCheckoutController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/customer/checkout?error=invalid_payment_method");
             return;
         }
+        if (OrderStatus.METHOD_SEPAY.equals(paymentMethod) && !SepayConfig.isQrConfigured()) {
+            response.sendRedirect(request.getContextPath()
+                    + "/customer/checkout?error=sepay_config_missing");
+            return;
+        }
 
         String fullAddress = address + ", " + ward + ", " + district + ", " + province;
 

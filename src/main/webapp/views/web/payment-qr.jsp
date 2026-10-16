@@ -12,6 +12,7 @@
                     <i class="fas fa-check-circle"></i>
                     <h2>Thanh toán thành công!</h2>
                     <p>Đơn hàng <strong>DH#${order.orderId}</strong> đã được xác nhận.</p>
+                    <p>Số tiền đã thanh toán: <strong><fmt:formatNumber value="${order.totalAmount}" pattern="###,###"/>đ</strong></p>
                     <c:if test="${not empty order.paidAt}">
                         <p>Thời điểm: <fmt:formatDate value="${order.paidAt}" pattern="HH:mm:ss dd/MM/yyyy"/></p>
                     </c:if>
@@ -25,7 +26,7 @@
                     <i class="fas fa-clock"></i>
                     <h2>Mã QR đã hết hạn</h2>
                     <p>Đơn hàng <strong>DH#${order.orderId}</strong> đã bị hủy do quá thời gian thanh toán.</p>
-                    <a href="${pageContext.request.contextPath}/customer/checkout" class="btn-ivy mt-3">ĐẶT LẠI</a>
+                    <a href="${pageContext.request.contextPath}/customer/cart" class="btn-ivy mt-3">QUAY LẠI GIỎ HÀNG / MUA LẠI</a>
                 </div>
             </c:when>
 
@@ -33,6 +34,15 @@
             <c:otherwise>
                 <h2 class="qr-title">Quét mã QR để thanh toán</h2>
 
+                <c:if test="${not qrConfigured}">
+                    <div class="qr-fallback qr-config-error">
+                        Thanh toán QR hiện chưa được cấu hình đầy đủ. Vui lòng chọn phương thức khác
+                        hoặc liên hệ quản trị viên.
+                    </div>
+                </c:if>
+
+                <c:if test="${qrConfigured}">
+                <div id="qr-payment-content">
                 <div class="qr-info-row">
                     <div class="qr-image-wrap">
                         <img src="${qrUrl}" alt="Mã QR thanh toán DH#${order.orderId}"
@@ -87,6 +97,8 @@
                     <strong>Không cần thao tác thêm.</strong>
                 </div>
 
+                </div>
+
                 <%-- Thông báo trạng thái (cập nhật bởi polling) --%>
                 <div id="status-area" class="qr-status-polling" style="display:none;"></div>
 
@@ -100,6 +112,7 @@
                         <i class="fas fa-times-circle"></i> Hủy thanh toán
                     </button>
                 </form>
+                </c:if>
             </c:otherwise>
         </c:choose>
 
@@ -130,6 +143,7 @@
 .btn-copy:hover { background:#f0f0f0; }
 .qr-countdown { margin:20px 0 8px; font-size:1rem; color:#e67e22; font-weight:600; }
 .qr-notice { background:#fffde7; border:1px solid #ffe082; border-radius:8px; padding:10px 14px; font-size:.85rem; color:#555; margin:12px 0 20px; }
+.qr-config-error { background:#fff3cd; border:1px solid #ffecb5; border-radius:8px; padding:16px; color:#664d03; }
 .qr-cancel-form { margin-top:8px; }
 .btn-cancel-payment { background:none; border:2px solid #e74c3c; color:#e74c3c; border-radius:8px; padding:8px 20px; cursor:pointer; font-weight:600; transition:.2s; }
 .btn-cancel-payment:hover { background:#e74c3c; color:#fff; }
@@ -145,6 +159,7 @@
 <script>
 (function(){
     const orderId   = '${order.orderId}';
+    const paidAmount = Number('${order.totalAmount}');
     const expiresAt = new Date('${order.expiresAt}').getTime();
     const ctxPath   = '${pageContext.request.contextPath}';
 
@@ -167,6 +182,11 @@
 
     // Polling mỗi 3 giây
     const statusArea = document.getElementById('status-area');
+    const qrPaymentContent = document.getElementById('qr-payment-content');
+    const cancelForm = document.querySelector('.qr-cancel-form');
+    if (!statusArea || !qrPaymentContent) {
+        return;
+    }
     let pollTimer;
     pollTimer = setInterval(function(){
         fetch(ctxPath + '/customer/payment/status?orderId=' + orderId)
@@ -176,22 +196,25 @@
                 if (st === 'Đã thanh toán (SePay)') {
                     clearInterval(pollTimer);
                     clearInterval(countdownTimer);
+                    if (qrPaymentContent) qrPaymentContent.style.display = 'none';
+                    if (cancelForm) cancelForm.style.display = 'none';
                     statusArea.style.display = 'block';
                     statusArea.className = 'qr-status qr-paid';
-                    statusArea.innerHTML = '<i class="fas fa-check-circle"></i><br><strong>Thanh toán thành công!</strong>'
-                        + (data.paidAt ? '<br><small>Xác nhận lúc ' + data.paidAt + '</small>' : '');
-                    // Ẩn nút hủy và QR
-                    const cancelForm = document.querySelector('.qr-cancel-form');
-                    if (cancelForm) cancelForm.style.display = 'none';
+                    statusArea.innerHTML = '<i class="fas fa-check-circle"></i>'
+                        + '<h2>Thanh toán thành công!</h2>'
+                        + '<p>Đơn hàng <strong>DH#' + orderId + '</strong> đã được xác nhận.</p>'
+                        + '<p>Số tiền đã thanh toán: <strong>' + paidAmount.toLocaleString('vi-VN') + 'đ</strong></p>'
+                        + (data.paidAt ? '<p>Thời điểm: <strong>' + data.paidAt + '</strong></p>' : '')
+                        + '<a href="' + ctxPath + '/customer/order-history" class="btn-ivy mt-3">XEM ĐƠN HÀNG</a>';
                 } else if (st === 'Hết hạn (SePay)') {
                     clearInterval(pollTimer);
                     clearInterval(countdownTimer);
+                    if (qrPaymentContent) qrPaymentContent.style.display = 'none';
+                    if (cancelForm) cancelForm.style.display = 'none';
                     statusArea.style.display = 'block';
                     statusArea.className = 'qr-status qr-expired';
                     statusArea.innerHTML = '<i class="fas fa-clock"></i><br><strong>Mã QR đã hết hạn.</strong>'
-                        + '<br><a href="' + ctxPath + '/customer/checkout" class="btn-ivy" style="margin-top:12px;">Đặt lại</a>';
-                    const cancelForm = document.querySelector('.qr-cancel-form');
-                    if (cancelForm) cancelForm.style.display = 'none';
+                        + '<br><a href="' + ctxPath + '/customer/cart" class="btn-ivy" style="margin-top:12px;">QUAY LẠI GIỎ HÀNG / MUA LẠI</a>';
                 }
             })
             .catch(function(){/* bỏ qua lỗi mạng thoáng qua */});

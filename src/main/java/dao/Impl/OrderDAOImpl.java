@@ -9,6 +9,7 @@ import java.util.List;
 import dao.OrderDAO;
 import model.*;
 import util.DBUtil;
+import util.OrderStatus;
 
 
 import dao.UserDAO;
@@ -284,6 +285,7 @@ public class OrderDAOImpl implements OrderDAO {
                         detail.setProductColor(rs.getString("product_color"));
 
                         ProductObject p = new ProductObject();
+                        p.setProductId(rs.getInt("product_id"));
                         p.setProductName(rs.getString("product_name"));
                         p.setProductImage(rs.getString("product_image"));
                         detail.setProductObject(p);
@@ -631,7 +633,8 @@ public class OrderDAOImpl implements OrderDAO {
 
     @Override
     public boolean insertPaymentTransaction(int orderId, String sepayTransactionId,
-                                             double amount, String content, String rawPayload) {
+                                             double amount, String content, String rawPayload)
+            throws SQLException {
         String sql = "INSERT INTO payment_transaction " +
                      "(sepay_transaction_id, order_id, amount, content, raw_payload, created_at) " +
                      "VALUES (?, ?, ?, ?, ?, NOW())";
@@ -645,12 +648,87 @@ public class OrderDAOImpl implements OrderDAO {
             ps.executeUpdate();
             return true;
         } catch (SQLException e) {
-            // Lỗi duplicate key → trả false (xử lý trùng bình thường)
             if (e.getMessage() != null && e.getMessage().contains("Duplicate")) {
                 return false;
             }
-            e.printStackTrace();
-            return false;
+            throw e;
+        }
+    }
+
+    @Override
+    public PaymentTransactionResult processPaymentTransaction(
+            OrderObject order, String sepayTransactionId, double amount,
+            String content, String rawPayload, java.sql.Timestamp paidAt,
+            String paidStatus, String lateStatus)
+            throws SQLException {
+        String insertTransactionSql = "INSERT INTO payment_transaction " +
+                "(sepay_transaction_id, order_id, amount, content, raw_payload, created_at) " +
+                "VALUES (?, ?, ?, ?, ?, NOW())";
+        Connection conn = null;
+        try {
+            conn = DBUtil.getConnection();
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement ps = conn.prepareStatement(insertTransactionSql)) {
+                ps.setString(1, sepayTransactionId);
+                ps.setInt(2, order.getOrderId());
+                ps.setDouble(3, amount);
+                ps.setString(4, content);
+                ps.setString(5, rawPayload);
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                if (e.getMessage() != null && e.getMessage().contains("Duplicate")) {
+                    conn.rollback();
+                    return PaymentTransactionResult.DUPLICATE;
+                }
+                throw e;
+            }
+
+            if (OrderStatus.PAY_EXPIRED_SEPAY.equals(order.getPaymentStatus())) {
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "UPDATE `Order` SET payment_status = ? WHERE order_id = ?")) {
+                    ps.setString(1, lateStatus);
+                    ps.setInt(2, order.getOrderId());
+                    ps.executeUpdate();
+                }
+            } else {
+                int rows;
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "UPDATE `Order` SET payment_status = ?, order_status = 'Đã xác nhận', paid_at = ? " +
+                                "WHERE order_id = ? AND payment_status = 'Chờ thanh toán online'")) {
+                    ps.setString(1, paidStatus);
+                    ps.setTimestamp(2, paidAt);
+                    ps.setInt(3, order.getOrderId());
+                    rows = ps.executeUpdate();
+                }
+
+                boolean purchaseLogRequired =
+                        rows == 1 && order.getUserId() != null && order.getUserId() > 0;
+                conn.commit();
+                return purchaseLogRequired
+                        ? PaymentTransactionResult.PROCESSED_WITH_PURCHASE_LOG
+                        : PaymentTransactionResult.PROCESSED;
+            }
+
+            conn.commit();
+            return PaymentTransactionResult.PROCESSED;
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackError) {
+                    e.addSuppressed(rollbackError);
+                }
+            }
+            throw e;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                } finally {
+                    conn.close();
+                }
+            }
         }
     }
 

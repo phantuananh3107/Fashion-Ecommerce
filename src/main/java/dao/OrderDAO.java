@@ -1,6 +1,7 @@
 package dao;
 
 import java.util.List;
+import java.sql.SQLException;
 
 import model.CartObject;
 import model.OrderInfo;
@@ -8,6 +9,11 @@ import model.OrderObject;
 
 
 public interface OrderDAO {
+    enum PaymentTransactionResult {
+        DUPLICATE,
+        PROCESSED,
+        PROCESSED_WITH_PURCHASE_LOG
+    }
 	
     List<OrderInfo> getRecentOrders(int limit);
     
@@ -78,7 +84,14 @@ public interface OrderDAO {
      * Trả false nếu sepayTransactionId đã tồn tại (duplicate).
      */
     boolean insertPaymentTransaction(int orderId, String sepayTransactionId,
-                                     double amount, String content, String rawPayload);
+                                     double amount, String content, String rawPayload)
+            throws SQLException;
+
+    PaymentTransactionResult processPaymentTransaction(
+            OrderObject order, String sepayTransactionId, double amount,
+            String content, String rawPayload, java.sql.Timestamp paidAt,
+            String paidStatus, String lateStatus)
+            throws SQLException;
 
     /**
      * Lấy danh sách orderId các đơn SEPAY hết hạn chưa xử lý.

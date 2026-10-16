@@ -3,6 +3,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <div class="checkout-page-wrapper container py-5">
+    <c:if test="${param.error == 'sepay_config_missing'}">
+        <div class="alert alert-danger" role="alert">
+            Thanh toán QR đang thiếu cấu hình tài khoản nhận tiền. Vui lòng chọn COD hoặc liên hệ quản trị viên.
+        </div>
+    </c:if>
     <form action="${pageContext.request.contextPath}/customer/process-checkout" method="POST">
         <div class="row">
             <div class="col-lg-7 pe-lg-5">
@@ -125,4 +130,3 @@
         </div>
     </form>
 </div>
-

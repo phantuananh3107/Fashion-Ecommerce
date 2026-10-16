@@ -63,11 +63,22 @@ public class PaymentQRController extends HttpServlet {
         String paymentCode = order.getPaymentCode();
         if (paymentCode == null) paymentCode = "DH" + orderId;
 
-        String qrUrl = "https://qr.sepay.vn/img"
-                + "?acc=" + URLEncoder.encode(SepayConfig.ACCOUNT_NUMBER, "UTF-8")
-                + "&bank=" + URLEncoder.encode(SepayConfig.BANK_CODE, "UTF-8")
-                + "&amount=" + (long) order.getTotalAmount()
-                + "&des=" + URLEncoder.encode(paymentCode, "UTF-8");
+        boolean qrConfigured = SepayConfig.isQrConfigured();
+        String qrUrl = null;
+        if (qrConfigured) {
+            long amount = (long) order.getTotalAmount();
+            qrUrl = "https://qr.sepay.vn/img"
+                    + "?acc=" + URLEncoder.encode(SepayConfig.ACCOUNT_NUMBER, "UTF-8")
+                    + "&bank=" + URLEncoder.encode(SepayConfig.BANK_CODE, "UTF-8")
+                    + "&amount=" + amount
+                    + "&des=" + URLEncoder.encode(paymentCode, "UTF-8");
+            String logUrl = "https://qr.sepay.vn/img"
+                    + "?acc=****"
+                    + "&bank=" + URLEncoder.encode(SepayConfig.BANK_CODE, "UTF-8")
+                    + "&amount=" + amount
+                    + "&des=" + URLEncoder.encode(paymentCode, "UTF-8");
+            System.err.println("[PaymentQR] QR URL: " + logUrl);
+        }
 
         request.setAttribute("order", order);
         request.setAttribute("qrUrl", qrUrl);
@@ -75,6 +86,7 @@ public class PaymentQRController extends HttpServlet {
         request.setAttribute("accountName", SepayConfig.ACCOUNT_NAME);
         request.setAttribute("bankCode", SepayConfig.BANK_CODE);
         request.setAttribute("paymentCode", paymentCode);
+        request.setAttribute("qrConfigured", qrConfigured);
 
         request.getRequestDispatcher("/views/web/payment-qr.jsp").forward(request, response);
     }
