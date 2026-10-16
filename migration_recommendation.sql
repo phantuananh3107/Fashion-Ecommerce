@@ -1,6 +1,6 @@
 -- Database Migration for Recommendation System
 -- Target DB: fashionecom (MySQL)
-
+use  fashionecom;
 CREATE TABLE IF NOT EXISTS `user_behavior_log` (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
     `user_id` INT NULL,
