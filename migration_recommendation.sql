@@ -1,4 +1,4 @@
--- Database Migration for Recommendation System
+git-- Database Migration for Recommendation System
 -- Target DB: fashionecom (MySQL)
 use  fashionecom;
 CREATE TABLE IF NOT EXISTS `user_behavior_log` (
