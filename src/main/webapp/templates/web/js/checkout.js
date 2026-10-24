@@ -1,14 +1,9 @@
 $(document).ready(function() {
-    // ==========================================
-    // 1. XỬ LÝ VOUCHER (MÃ GIẢM GIÁ)
-    // ==========================================
     $(".btn-apply").click(function(e) {
         e.preventDefault();
 
-        // Lấy mã từ ô input (Dùng ID đã thêm ở JSP)
         var voucherInput = $("#voucher-input");
 
-        // Kiểm tra nếu không tìm thấy ô input thì báo lỗi nhẹ để debug
         if (voucherInput.length === 0) {
             console.error("Không tìm thấy ô nhập mã giảm giá (#voucher-input)");
             return;
@@ -22,7 +17,6 @@ $(document).ready(function() {
         }
 
         $.ajax({
-            // Đảm bảo đường dẫn này đúng với Context Path của bạn
             url: window.location.origin + "/jsp_servlet_war_exploded/api/check-voucher",
             type: "GET",
             data: { code: voucherCode },
@@ -30,16 +24,13 @@ $(document).ready(function() {
                 if (response.success) {
                     var discount = response.discount;
 
-                    // 1. Hiển thị dòng Giảm giá và số tiền giảm
                     $("#discount-row").show();
                     $("#discount-display").text("-" + discount.toLocaleString() + "đ");
 
-                    // 2. Tính lại tổng tiền thanh toán
                     var totalOriginal = parseInt($("#final-total-display").attr("data-original-sum"));
                     var totalAfter = totalOriginal - discount;
                     if(totalAfter < 0) totalAfter = 0;
 
-                    // 3. Cập nhật số tiền cuối cùng
                     $("#final-total-display").text(totalAfter.toLocaleString() + "đ");
 
                     showToast("Áp dụng mã " + voucherCode + " thành công!");
@@ -53,9 +44,6 @@ $(document).ready(function() {
         });
     });
 
-    // ==========================================
-    // 2. XỬ LÝ ĐỊA CHỈ (Giữ nguyên vì đã chuẩn)
-    // ==========================================
 
     const addressData = {
         "Hà Nội": {
@@ -136,7 +124,6 @@ $(document).ready(function() {
             });
         }
 
-        // CHỐT CHẶN: Ép thư viện giao diện phải cập nhật lại dữ liệu Quận/Huyện
         updateSelectUI();
     });
 
@@ -151,11 +138,9 @@ $(document).ready(function() {
             });
         }
 
-        // CHỐT CHẶN: Ép thư viện giao diện phải cập nhật lại dữ liệu Phường/Xã
         updateSelectUI();
     });
 
-    // Hàm cập nhật giao diện thông minh, tự nhận diện thư viện em đang dùng
     function updateSelectUI() {
         if ($.fn.niceSelect) {
             $('#district, #ward').niceSelect('update');

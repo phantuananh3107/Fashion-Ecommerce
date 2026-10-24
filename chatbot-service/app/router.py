@@ -1,46 +1,17 @@
-"""
-HybridRouter — Định tuyến 3 tầng: Rule (T1) → JEV (T2) → LLM (T3).
-
-Thiết kế sau khi grid search trên tập test (46 câu):
-  - JEV đạt 80.4%, Rule 71.7%, Hybrid cũ (Rule short-circuit 0.85) chỉ 76.1%.
-  - Nguyên nhân: Rule chốt pattern ở 0.92 nhưng SAI ở 9 case có ngữ nghĩa
-    (vd "mình cao 1m75 nặng 70kg thì chọn size áo" → Rule đoán find_product,
-    đúng ra size_guide).
-  - Vì vậy: **JEV là bộ phân loại chính**, Rule giữ vai trò bảo vệ và trích entity.
-
-Vai trò từng tầng:
-  T1 Rule  — (a) chặn out_of_scope nhanh, không gọi tool
-            (b) trích entity + required-entity (ask_missing)
-            (c) short-circuit intent rõ ràng: greeting/goodbye/thanks,
-                track_order có mã đơn, out_of_scope
-  T2 JEV   — quyết định intent cho phần còn lại (đây là điểm chính)
-  T3 LLM   — chỉ khi JEV mơ hồ VÀ Rule không đồng ý → Qwen 7B phân xử
-
-Ngưỡng (lấy từ scripts/tune_thresholds.py, xem data/thresholds.json):
-  RULE_SHORT_CIRCUIT = 0.92  intent nào Rule chắc chắn thì bỏ qua JEV
-  JEV_TAU             = 0.72  dưới ngưỡng này → xét T3
-  RULE_OVERRIDE_MIN   = 0.80  Rule được quyền phủ định quyết định của JEV
-"""
 import time
 from typing import Any
 
 from app.intent_matcher import IntentMatcher
 from app.jev_service import JEVMatcher, JEVNotAvailableError
 
-# --- Ngưỡng ---
+
 RULE_SHORT_CIRCUIT = 0.92
 RULE_LOW = 0.30
 JEV_TAU = 0.72
 RULE_OVERRIDE_MIN = 0.80
 
-# Intent nào Rule đủ tin cậy để bỏ qua JEV hoàn toàn (ngắn, dạng cụm cố định,
-# không có ngữ nghĩa tra cứu cấu hình sản phẩm).
-# LƯU Ý: KHÔNG đưa "unclear" vào đây — Rule trả unclear với conf=0.0 cho câu
-# diễn đạt tự nhiên ("mình đi biển mặc gì đẹp") mà JEV nhận đúng find_product.
 RULE_TRUSTED_INTENTS = {"greeting", "goodbye", "thanks", "out_of_scope"}
 
-# Tool mặc định theo intent — dùng khi Rule không gắn tool (vd Rule trả "unclear"
-# nhưng JEV phân loại đúng intent nghiệp vụ).
 DEFAULT_TOOL_BY_INTENT: dict[str, tuple[str | None, dict[str, Any]]] = {
     "find_product": ("search_products", {}),
     "check_availability": ("check_stock", {}),
@@ -96,7 +67,6 @@ class HybridRouter:
                 return False
         return self.jev.loaded
 
-    # ------------------------------------------------------------------ quyết định
     def _rule_can_short_circuit(self, r: dict[str, Any]) -> bool:
         """
         Rule được quyền kết luận ngay mà không cần JEV xác nhận:
@@ -112,11 +82,11 @@ class HybridRouter:
             return False
         ents = r.get("entities", {}) or {}
         if "order_code" in ents:
-            return True  # mã đơn DHxxxx / SĐT — regex, không thể mơ hồ
+            return True
         if r["intent"] == "cancel_order":
-            return True  # "hủy đơn" — regex, không thể mơ hồ
+            return True
         if r["intent"] == "check_availability" and (ents.get("keyword") or ents.get("product_name")):
-            return True  # hỏi hàng + tên sản phẩm cụ thể
+            return True
         if r["intent"] == "track_order":
             return True
         if r["intent"] in ("price_query", "check_policy", "complaint", "review_query", "promotion_query"):
@@ -138,7 +108,6 @@ class HybridRouter:
             return True
         return False
 
-    # ------------------------------------------------------------------ finalize
     def _finalize(self, tier: int, route: str, base: dict[str, Any],
                   extra: dict[str, Any] | None = None,
                   tier1_ms: float = 0.0, tier2_ms: float | None = None) -> dict[str, Any]:
@@ -159,43 +128,36 @@ class HybridRouter:
             out.update(extra)
         return out
 
-    # ------------------------------------------------------------------ route
     def route(self, text: str) -> dict[str, Any]:
         t0 = time.perf_counter()
 
-        # ================= Tầng 1: Rule
         t1 = time.perf_counter()
         r = self.rule.match(text)
         t1_ms = (time.perf_counter() - t1) * 1000.0
 
-        # 1a. out_of_scope chắc chắn → không gọi tool, không cần JEV
         if r["intent"] == "out_of_scope" and r["confidence"] >= 0.9:
             out = self._finalize(1, "tier1", r, tier1_ms=t1_ms)
             out["rule_confidence"] = r["confidence"]
             out["latency_ms"]["total"] = out["latency_ms"]["tier1"]
             return out
 
-        # 1b. Rule đủ tin cậy → short-circuit (intent xã giao, mã đơn rõ ràng)
         if self._rule_can_short_circuit(r):
             out = self._finalize(1, "tier1", r, tier1_ms=t1_ms)
             out["rule_confidence"] = r["confidence"]
             out["latency_ms"]["total"] = out["latency_ms"]["tier1"]
             return out
 
-        # 1c. Rule rất yếu và JEV không dùng được → Tầng 3 (LLM), vẫn ghi rõ là fallback-t3
         if r["confidence"] < self.rule_low and not self.ensure_jev():
             out = self._finalize(3, "tier3", r, tier1_ms=t1_ms)
             out["rule_confidence"] = r["confidence"]
             out["latency_ms"]["total"] = out["latency_ms"]["tier1"]
             return out
 
-        # ================= Tầng 2: JEV (bộ phân loại chính)
         if self.ensure_jev():
             try:
                 j = self.jev.match(text)
                 t2_ms = j["latency_ms"]
 
-                # 2a. Rule phủ quyết định JEV (out_of_scope sai, hoặc có mã đơn)
                 if self._rule_should_override(j, r):
                     out = self._finalize(2, "tier2", r, tier1_ms=t1_ms, tier2_ms=t2_ms)
                     out.update(
@@ -207,26 +169,19 @@ class HybridRouter:
                     out["latency_ms"]["total"] = round(t1_ms + (t2_ms or 0.0), 1)
                     return out
 
-                # 2b. JEV đủ chắc → JEV quyết định intent
                 if j["confidence"] >= self.jev_tau:
                     if r["intent"] == j["intent"]:
                         final = r
                     elif r["intent"] == "find_product":
-                        # Rule khớp pattern sản phẩm nhưng JEV hiểu ngữ nghĩa khác →
-                        # JEV quyết (trừ khi JEV không sáng hơn Rule rõ rệt)
                         jev_edge = (j["confidence"] or 0) - (r["confidence"] or 0)
                         final = self._merge(r, j) if jev_edge >= -0.05 else r
                     elif r["intent"] == "unclear":
-                        # Rule không hiểu (conf thấp), JEV hiểu rõ → tin JEV.
-                        # Đây là vì sao "unclear" KHÔNG nằm trong RULE_TRUSTED_INTENTS:
-                        # câu diễn đạt tự nhiên như "mình đi biển mặc gì đẹp" phải
-                        # để JEV phân loại thành find_product thay vì hỏi lại.
                         if j["intent"] != "unclear":
                             final = self._merge(r, j)
                         else:
                             final = r
                     else:
-                        final = r  # Rule có confidence cao hơn 0.85, ưu tiên Rule
+                        final = r
                     out = self._finalize(2, "tier2", final, tier1_ms=t1_ms, tier2_ms=t2_ms)
                     out.update(
                         rule_confidence=r["confidence"],
@@ -236,7 +191,6 @@ class HybridRouter:
                     out["latency_ms"]["total"] = round(t1_ms + (t2_ms or 0.0), 1)
                     return out
 
-                # 2c. Rule và JEV đồng ý → tin cả hai, khỏi cần LLM
                 if r["intent"] == j["intent"]:
                     out = self._finalize(2, "tier2", r, tier1_ms=t1_ms, tier2_ms=t2_ms)
                     out.update(
@@ -247,9 +201,8 @@ class HybridRouter:
                     return out
 
             except (JEVNotAvailableError, ValueError, OSError, RuntimeError):
-                pass  # JEV lỗi → rơi xuống T3
+                pass
 
-        # ================= Tầng 3: LLM (FastAPI gọi Ollama)
         out = self._finalize(3, "tier3", r, tier1_ms=t1_ms)
         out["rule_confidence"] = r["confidence"]
         out["latency_ms"]["total"] = out["latency_ms"]["tier1"]

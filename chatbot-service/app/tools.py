@@ -1,18 +1,3 @@
-"""
-Tool Executor — Thực thi tool của chatbot trên MySQL thật (database `sys`).
-
-Đây là mảnh còn thiếu khiến tier1/tier2 chọn tool nhưng trả reply=None:
-router quyết định đúng tool, nhưng chưa có nơi thực thi. Module này lấp chỗ đó.
-
-4 tool khớp TOOL_SCHEMAS trong app/llm_client.py:
-  - search_products(keyword, category, color, size, max_price)
-  - check_stock(product_name, size, color)
-  - lookup_faq(topic)
-  - get_order(order_code, phone)
-
-Kết nối MySQL dùng chung biến môi trường với web app (DB_NAME/DB_USER/DB_PASS)
-để một nguồn cấu hình duy nhất — đọc từ .env của Fashion-Ecommerce.
-"""
 from __future__ import annotations
 
 import json
@@ -21,9 +6,6 @@ import re
 from pathlib import Path
 from typing import Any
 
-# ---------------------------------------------------------------------------
-# Config — đọc .env của Fashion-Ecommerce (một nguồn sự thật)
-# ---------------------------------------------------------------------------
 _ENV_CANDIDATES = [
     Path(__file__).resolve().parent.parent / ".env",            # chatbot-service/.env
     Path(__file__).resolve().parent.parent.parent / ".env",     # Fashion-Ecommerce/.env
@@ -85,9 +67,6 @@ def _final_price(price: Any, discount: Any) -> int:
         return 0
 
 
-# ---------------------------------------------------------------------------
-# FAQ — trả lời chính sách (tĩnh, khớp shop TA)
-# ---------------------------------------------------------------------------
 FAQ = {
     "shipping": "Đơn nội thành giao 1-2 ngày, ngoại thành 3-5 ngày. Freeship cho đơn từ 300.000đ.",
     "return": "Đổi trả trong 7 ngày nếu sản phẩm chưa qua sử dụng, còn nguyên tem mác và hóa đơn.",
@@ -118,9 +97,6 @@ def _resolve_topic(topic: str | None, query: str) -> str:
     return topic if topic else "shipping"
 
 
-# ---------------------------------------------------------------------------
-# Tool implementations
-# ---------------------------------------------------------------------------
 def search_products(args: dict[str, Any], query: str = "") -> dict[str, Any]:
     keyword = (args.get("keyword") or "").strip()
     category = (args.get("category") or "").strip()
@@ -177,7 +153,7 @@ def search_products(args: dict[str, Any], query: str = "") -> dict[str, Any]:
             "size": r["product_size"],
             "stock": r["product_quantity"],
             "category": r["category_name"],
-            "product_url": f"/public/trang-chi-san-pham?id={r['id']}&ref=chatbot",
+            "product_url": f"/public/product-detail?id={r['id']}&ref=chatbot",
         })
     return {"total": len(rows), "products": items}
 
@@ -187,7 +163,6 @@ def check_stock(args: dict[str, Any], query: str = "") -> dict[str, Any]:
     size = (args.get("size") or "").strip()
     color = (args.get("color") or "").strip()
 
-    # Nếu router không trích được tên SP, lấy keyword sản phẩm từ câu hỏi
     if not name:
         m = re.search(
             r"(áo thun|áo sơ mi|áo khoác|áo polo|áo len|áo hoodie|quần jean|quần tây|quần short|"
@@ -199,11 +174,8 @@ def check_stock(args: dict[str, Any], query: str = "") -> dict[str, Any]:
     if not name:
         return {"found": False, "message": "Bạn cho mình tên sản phẩm cần kiểm tra tồn kho nhé."}
 
-    # Tìm theo từng từ trong tên (OR) để bắt được "áo khoác" → "áo khoác dù", "áo khoác bomber"...
-    # Ưu tiên cụm dài trước (dùng AND cho cụm >= 2 từ) để tránh "áo khoác" khớp nhầm "áo polo".
     terms = [t for t in name.split() if len(t) > 1] or [name]
     if len(terms) >= 2:
-        # AND các từ: "áo khoác" chỉ khớp sản phẩm chứa cả "áo" và "khoác"
         where = " AND ".join(["p.product_name LIKE %s"] * len(terms))
     else:
         where = "p.product_name LIKE %s"
@@ -219,7 +191,6 @@ def check_stock(args: dict[str, Any], query: str = "") -> dict[str, Any]:
             cur.execute(sql, params)
             rows = cur.fetchall()
             if not rows and len(terms) >= 2:
-                # Nới lỏng: nếu AND không ra, thử OR với từ khóa chính (từ dài nhất)
                 main = max(terms, key=len)
                 cur.execute(
                     f"SELECT p.product_name, p.product_size, p.product_color, p.product_quantity, "
@@ -234,7 +205,6 @@ def check_stock(args: dict[str, Any], query: str = "") -> dict[str, Any]:
     if not rows:
         return {"found": False, "message": f"Mình chưa tìm thấy sản phẩm '{name}' trong shop."}
 
-    # Ưu tiên dòng có tồn kho
     r = rows[0]
     available = int(r["product_quantity"] or 0) > 0
     if size and size.lower() not in str(r["product_size"] or "").lower():
@@ -259,7 +229,6 @@ def get_order(args: dict[str, Any], query: str = "") -> dict[str, Any]:
     code = (args.get("order_code") or "").strip()
     phone = (args.get("phone") or "").strip()
 
-    # Mã đơn DH1234 → số 1234
     order_id = None
     if code:
         m = re.search(r"(\d+)", code)
@@ -309,9 +278,6 @@ def get_order(args: dict[str, Any], query: str = "") -> dict[str, Any]:
     }
 
 
-# ---------------------------------------------------------------------------
-# Tool bổ trợ: hủy đơn, tạo ticket khiếu nại, xem đánh giá
-# ---------------------------------------------------------------------------
 def cancel_order(args: dict[str, Any], query: str = "") -> dict[str, Any]:
     """
     Hủy đơn hàng. Chỉ cho phép khi đơn CHƯA giao (Chờ xử lý / Đang xử lý).
@@ -375,9 +341,6 @@ def get_reviews(args: dict[str, Any], query: str = "") -> dict[str, Any]:
     }
 
 
-# ---------------------------------------------------------------------------
-# Dispatcher
-# ---------------------------------------------------------------------------
 _DISPATCH = {
     "search_products": search_products,
     "check_stock": check_stock,
@@ -405,7 +368,6 @@ def execute_tool_json(name: str, args: dict[str, Any] | None = None, query: str 
 
 
 if __name__ == "__main__":
-    # Smoke test nhanh
     for tool, args in [
         ("search_products", {"keyword": "áo thun", "color": "đen"}),
         ("check_stock", {"product_name": "áo polo", "size": "M"}),

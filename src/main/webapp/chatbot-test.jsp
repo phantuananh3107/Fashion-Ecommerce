@@ -1,4 +1,3 @@
-<!-- TEST PAGE - Để verify ChatBot hoạt động -->
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
@@ -149,14 +148,11 @@
         </div>
     </div>
 
-    <!-- Include ChatBot Widget -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
-    <!-- ChatBot HTML & CSS -->
     <%@ include file="/common/web/chatbot.jsp" %>
 
-    <!-- ChatBot JavaScript -->
     <script src="${pageContext.request.contextPath}/templates/web/js/chatbot.js"></script>
 </body>
 </html>

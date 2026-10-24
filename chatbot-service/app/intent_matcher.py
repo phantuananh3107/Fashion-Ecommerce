@@ -1,14 +1,3 @@
-"""
-Intent Matcher — Tầng 1 của chatbot Hybrid.
-Rule-based: regex patterns + keyword scoring + entity extraction + resolution rules.
-Không cần ML, chạy nhanh, dễ debug, dễ mở rộng.
-
-Scoring:
-  - Pattern match (word-boundary)  → 0.92
-  - Keyword match                  → min(0.75, 0.35 + 0.12 * số keyword khớp)
-  - Threshold                      → 0.3
-  - Resolution rules phân xử conflict giữa các intent.
-"""
 import json
 import re
 import unicodedata
@@ -30,9 +19,7 @@ def normalize_text(text: str) -> str:
 
 
 def remove_accents(text: str) -> str:
-    """Bỏ dấu tiếng Việt để match cả không dấu."""
-    # 'đ'/'Đ' không có decomposition trong Unicode NFKD → thay thủ công
-    text = text.replace("đ", "d").replace("Đ", "D")
+    """Bỏ dấu tiếng Việt để match cả không dấu."""    text = text.replace("đ", "d").replace("Đ", "D")
     nfkd = unicodedata.normalize("NFKD", text)
     return "".join(c for c in nfkd if not unicodedata.combining(c))
 
@@ -76,7 +63,6 @@ class IntentMatcher:
             intent["_compiled_patterns"] = [
                 re.compile(p, re.IGNORECASE) for p in intent.get("patterns", [])
             ]
-        # từ khóa nhận diện tín hiệu mua sắm (chống out_of_scope false-positive)
         self.shopping_signals = [
             "áo", "ao", "quần", "quan", "váy", "vay", "đầm", "dam", "giày", "giay",
             "túi", "tui", "đơn", "don", "shop", "sản phẩm", "san pham", "size",
@@ -87,13 +73,11 @@ class IntentMatcher:
         """Trả về (score 0..1, số keyword khớp)."""
         score = 0.0
 
-        # 1. Pattern match (mạnh nhất)
         for pat in intent["_compiled_patterns"]:
             if pat.search(text) or pat.search(text_no_accents):
                 score = 0.92
                 break
 
-        # 2. Keyword match (token-based, tránh substring false-positive)
         keywords = intent.get("keywords", [])
         matched = 0
         for kw in keywords:
@@ -144,61 +128,51 @@ class IntentMatcher:
                 for k in kws
             )
 
-        # cancel: có "hủy" → cancel_order wins
         if has("hủy đơn", "huy don", "không lấy", "khong lay", "hủy hàng") and \
                 name in ("track_order", "find_product", "unclear"):
             return self._by_name("cancel_order"), max(score, 0.9)
 
-        # availability: có "còn hàng/còn không" + find_product
         if name == "find_product" and has(
             "còn hàng", "con hang", "còn không", "con khong",
             "còn size", "con size", "còn màu", "con mau",
         ):
             return self._by_name("check_availability"), max(score, 0.85)
 
-        # price: chỉ khi hỏi trực tiếp về giá, KHÔNG phải "giá rẻ" / "giá cả"
         if name in ("find_product", "price_query", "unclear") and has(
             "giá bao nhiêu", "gia bao nhieu", "bao nhiêu tiền", "bao nhieu tien",
             "giá là bao nhiêu", "gia la bao nhieu",
         ):
             return self._by_name("price_query"), max(score, 0.85)
 
-        # price: câu bắt đầu bằng "giá" (vd "giá quần jean nam")
         if name == "find_product" and text.split()[:1] in (["giá"], ["gia"]):
             return self._by_name("price_query"), max(score, 0.85)
 
-        # policy: từ khóa chính sách/đổi trả/thanh toán khi best là find/unclear
         if name in ("find_product", "unclear") and has(
             "đổi trả", "doi tra", "trả hàng", "tra hang", "chính sách", "chinh sach",
             "thanh toán", "thanh toan", "bảo hành", "bao hanh", "ship",
         ):
             return self._by_name("check_policy"), max(score, 0.8)
 
-        # review: có từ review/đánh giá
         if name in ("find_product", "price_query", "unclear") and has(
             "đánh giá", "danh gia", "review", "nhận xét", "nhan xet", "tốt không", "tot khong",
         ):
             return self._by_name("review_query"), max(score, 0.8)
 
-        # complaint: có từ lỗi/sai/khiếu nại
         if name in ("find_product", "unclear") and has(
             "bị lỗi", "bi loi", "giao sai", "khiếu nại", "khieu nai",
             "chất lượng kém", "chan luong kem", "phàn nàn", "phan nan", "hàng lỗi",
         ):
             return self._by_name("complaint"), max(score, 0.85)
 
-        # promotion: có voucher/khuyến mãi nhưng bị availability chặn ("còn không")
         if name in ("check_availability", "find_product", "unclear") and has(
             "voucher", "khuyến mãi", "khuyen mai", "giảm giá", "giam gia",
             "freeship", "mã giảm", "ma giam",
         ):
             return self._by_name("promotion_query"), max(score, 0.8)
 
-        # track: có order_code hoặc "đơn của mình"
         if name == "find_product" and ("order_code" in entities or has("đơn của mình", "don cua minh")):
             return self._by_name("track_order"), max(score, 0.85)
 
-        # greeting: có "chào/hello/hi" nhưng bị find chặn
         if name == "find_product" and has(
             "chào", "chao", "hello", "xin chào", "xin chao",
         ) and len(text.split()) <= 3:
@@ -221,14 +195,12 @@ class IntentMatcher:
         text_no_accents = remove_accents(text)
         text_expanded = expand_teencode(text, self.teencode_map)
 
-        # 1. Out-of-scope (chỉ khi không có tín hiệu mua sắm)
         if not self._has_shopping_signal(text, text_no_accents) and self._is_out_of_scope(
             text, text_no_accents
         ):
             oos = self._by_name("out_of_scope")
             return self._result(oos, 0.95, {}, is_out_of_scope=True)
 
-        # 2. Scoring mọi intent (trừ meta)
         scored: list[tuple[dict, float, int]] = []
         matched_kw: dict[str, int] = {}
         for intent in self.intents:
@@ -238,20 +210,16 @@ class IntentMatcher:
             scored.append((intent, s, kw))
             matched_kw[intent["name"]] = kw
 
-        # 3. Chọn điểm cao nhất, bằng điểm thì priority cao hơn
         scored.sort(key=lambda x: (-x[1], -x[0].get("priority", 0)))
         best, best_score, _ = scored[0]
 
-        # 4. Resolution rules
         best, best_score = self._resolve(best, best_score, text, text_no_accents,
                                          self._extract_entities(text), matched_kw)
 
-        # 5. Dưới ngưỡng → unclear
         if best_score < THRESHOLD:
             unclear = self._by_name("unclear")
             return self._result(unclear, 0.0, {})
 
-        # 6. Entities + required check
         entities = self._extract_entities(text)
         required = best.get("required_entities", [])
         missing = [e for e in required if e not in entities]

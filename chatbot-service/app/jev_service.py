@@ -1,21 +1,3 @@
-"""
-JEV Service — Tầng 2 của chatbot Hybrid.
-
-JEV (Joint Embedding Vector) = embedding câu hỏi bằng mô hình multilingual
-(intfloat/multilingual-e5-small) rồi tính cosine với centroid của từng intent.
-
-Kiến trúc:
-  - Lazy-load model: không crash khi chưa cài sentence-transformers/torch.
-  - E5 yêu cầu prefix "query: " cho câu hỏi.
-  - Centroid đọc từ data/centroids.json (do scripts/build_centroids.py sinh).
-
-Cách dùng:
-    from app.jev_service import JEVMatcher
-    jev = JEVMatcher()            # lỗi ImportError rõ ràng nếu thiếu lib
-    jev.load()                    # tải model + centroids
-    result = jev.match("tim ao thun den")
-    # {"intent": "find_product", "confidence": 0.81, "top3": [...], "latency_ms": 52}
-"""
 import json
 import time
 from pathlib import Path
@@ -52,7 +34,6 @@ class JEVMatcher:
         self._matrix = None  # np.ndarray (n_intent, dim)
         self.model_meta: dict[str, Any] = {}
 
-    # ------------------------------------------------------------------ load
     def load(self) -> "JEVMatcher":
         """Tải model embedding + centroids. Ném JEVNotAvailableError nếu thiếu lib."""
         try:
@@ -95,7 +76,6 @@ class JEVMatcher:
     def loaded(self) -> bool:
         return self._model is not None and self._matrix is not None
 
-    # ----------------------------------------------------------------- embed
     def embed(self, text: str) -> list[float]:
         """Vector hóa 1 câu (L2-normalized)."""
         if not self.loaded:
@@ -103,7 +83,6 @@ class JEVMatcher:
         vec = self._model.encode(QUERY_PREFIX + text, normalize_embeddings=True)
         return [float(x) for x in vec]
 
-    # ------------------------------------------------------------------ match
     def match(self, text: str) -> dict[str, Any]:
         """
         Trả về:
@@ -125,14 +104,13 @@ class JEVMatcher:
         )
 
         if self.match_mode == "maxsim" and self._samples:
-            # max-similarity tới từng mẫu câu (chính xác hơn centroid trung bình)
             scored = []
             for intent, vecs in self._samples.items():
                 best_sim = max(float(_np.dot(v, q)) for v in vecs) if vecs else -1.0
                 scored.append((best_sim, intent))
             scored.sort(reverse=True)
         else:
-            sims = self._matrix @ q  # cosine vì cả 2 đã normalize
+            sims = self._matrix @ q
             scored = sorted(
                 ((float(sims[i]), self._intent_names[i]) for i in range(len(sims))),
                 reverse=True,

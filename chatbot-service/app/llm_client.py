@@ -1,11 +1,3 @@
-"""
-LLM Client — Tầng 3 của chatbot Hybrid.
-
-Gọi Ollama (Qwen2.5 7B Instruct Q4_K_M) qua REST API, hỗ trợ tool calling.
-Không phụ thuộc thư viện ngoài (chỉ urllib) để nhẹ và dễ debug.
-
-Tool schemas theo chuẩn OpenAI function-calling mà Ollama/Qwen hỗ trợ.
-"""
 import json
 import time
 import urllib.error
@@ -31,9 +23,6 @@ Ví dụ:
 - "có mã giảm giá không" → gọi lookup_faq(topic="promotion")
 """
 
-# --------------------------------------------------------------------------
-# Tool schemas (OpenAI-compatible function calling)
-# --------------------------------------------------------------------------
 TOOL_SCHEMAS: list[dict[str, Any]] = [
     {
         "type": "function",
@@ -115,7 +104,6 @@ class OllamaClient:
         self.model = model
         self.timeout = timeout
 
-    # ------------------------------------------------------------------ utils
     def _post(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
         url = f"{self.host}{path}"
         data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
@@ -139,7 +127,6 @@ class OllamaClient:
         except Exception as e:  # noqa: BLE001
             return {"ok": False, "error": str(e), "models": [], "has_model": False}
 
-    # ----------------------------------------------------------------- chat
     def chat(
         self,
         messages: list[dict[str, str]],
@@ -186,10 +173,6 @@ def _extract_tool_calls(message: dict[str, Any]) -> list[dict[str, Any]]:
         calls.append({"name": fn.get("name", ""), "arguments": args})
     return calls
 
-
-# --------------------------------------------------------------------------
-# Tool registry — chỗ gắn implementation thật (sẽ nối MySQL ở tuần 3)
-# --------------------------------------------------------------------------
 def stub_tools(args: dict[str, Any]) -> str:
     """Tool giả lập — trả dữ liệu mẫu. Thay bằng truy vấn MySQL thật ở tuần 3."""
     name = args.get("name", "")

@@ -1,16 +1,3 @@
-"""
-FastAPI service — Chatbot 3 tầng cho website thời trang.
-
-Endpoint:
-  POST /api/chat
-    Body: {"message": str, "user_id": str|None, "session_id": str|None}
-    Response: {reply, intent, route, tier, tool_called, entities, latency_ms}
-
-  GET  /health          — trạng thái Rule/JEV/Ollama
-  GET  /metrics         — thống kê route (tier1/tier2/tier3) + latency
-
-Chạy:  uvicorn app.main:app --host 0.0.0.0 --port 8000
-"""
 from __future__ import annotations
 
 import json
@@ -40,16 +27,10 @@ from app.llm_client import (  # noqa: E402
 from app.router import HybridRouter  # noqa: E402
 from app.tools import execute_tool  # noqa: E402
 
-# ---------------------------------------------------------------------------
-# Config
-# ---------------------------------------------------------------------------
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5:7b-instruct-q4_K_M")
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 ENABLE_LLM = os.getenv("ENABLE_LLM", "1") == "1"
 
-# ---------------------------------------------------------------------------
-# State
-# ---------------------------------------------------------------------------
 class AppState:
     def __init__(self) -> None:
         self.rule: IntentMatcher | None = None
@@ -64,16 +45,12 @@ class AppState:
 state = AppState()
 
 
-# ---------------------------------------------------------------------------
-# Lifespan
-# ---------------------------------------------------------------------------
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     # Tải Rule (nhanh)
     state.rule = IntentMatcher()
     print("[startup] Rule matcher: OK")
 
-    # Tải JEV (E5-small, ~30-60s lần đầu)
     try:
         state.jev = JEVMatcher()
         state.jev.load()
@@ -82,11 +59,9 @@ async def lifespan(_: FastAPI):
         print(f"[startup] JEV: KHÔNG KHẢ DỤNG ({e}) — router sẽ fallback T3")
         state.jev = None
 
-    # Router
     state.router = HybridRouter(rule=state.rule, jev=state.jev, enable_jev=state.jev is not None)
     print(f"[startup] Router: JEV={'ON' if state.jev else 'OFF'}")
 
-    # LLM (Ollama) — kiểm tra kết nối, không pull model
     if ENABLE_LLM:
         state.llm = OllamaClient(host=OLLAMA_HOST, model=OLLAMA_MODEL)
         h = state.llm.health()
@@ -108,10 +83,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-# ---------------------------------------------------------------------------
-# Schemas
-# ---------------------------------------------------------------------------
 class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1, max_length=2000, description="Câu hỏi của khách")
     user_id: str | None = Field(None, description="ID người dùng (nếu đã đăng nhập)")
@@ -129,9 +100,6 @@ class ChatResponse(BaseModel):
     latency_ms: dict[str, float | None] = {}
 
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
 def _render_tool_reply(tool: str | None, result: dict[str, Any], ask_missing: str | None) -> str | None:
     """
     Sinh câu trả lời tiếng Việt từ kết quả tool cho tier1/tier2 (không qua LLM).
@@ -200,7 +168,6 @@ def _run_tool(router_result: dict[str, Any], text: str) -> dict[str, Any]:
     """Thực thi tool mà router đã chọn, gắn reply vào kết quả."""
     tool = router_result.get("tool")
     args = router_result.get("tool_args", {}) or {}
-    # Bổ sung entity router trích được vào args (keyword/color/size/order_code...)
     for k, v in (router_result.get("entities", {}) or {}).items():
         args.setdefault(k, v)
     result = execute_tool(tool, args, query=text) if tool else {}
@@ -228,7 +195,6 @@ def _run_llm_tier3(text: str, router_result: dict[str, Any]) -> dict[str, Any]:
         tc = tool_calls[0]
         tool_result = execute_tool(tc["name"], tc.get("arguments", {}), query=text)
 
-        # Đợt 2: đưa tool_result về LLM
         msgs2 = msgs + [
             {"role": "assistant", "tool_calls": raw.get("message", {}).get("tool_calls", [])},
             {"role": "tool", "content": json.dumps(tool_result, ensure_ascii=False)},
@@ -244,15 +210,10 @@ def _run_llm_tier3(text: str, router_result: dict[str, Any]) -> dict[str, Any]:
         }
     except (LLMError, Exception) as e:  # noqa: BLE001
         print(f"[tier3] LLM error: {e}")
-        # Fallback: vẫn thực thi tool theo router nếu có
         return _run_tool(router_result, text) if router_result.get("tool") else {
             **router_result, "reply": router_result.get("reply") or "Xin lỗi, hệ thống đang bận."
         }
 
-
-# ---------------------------------------------------------------------------
-# Endpoints
-# ---------------------------------------------------------------------------
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(req: ChatRequest) -> ChatResponse:
     if state.router is None:
@@ -262,14 +223,11 @@ async def chat(req: ChatRequest) -> ChatResponse:
     result = state.router.route(req.message)
     total_ms = (time.perf_counter() - t0) * 1000.0
 
-    # Tầng 3 → gọi LLM chọn tool (trừ out_of_scope/unclear)
     if result["route"] == "tier3" and result["intent"] not in ("out_of_scope", "unclear"):
         result = _run_llm_tier3(req.message, result)
-    # Tầng 1/2 → thực thi tool router đã chọn (đây là mấu chốt trước đây bị thiếu)
     elif result.get("tool"):
         result = _run_tool(result, req.message)
 
-    # Thống kê
     state.route_counts[result["route"]] += 1
     state.latency_samples.append(total_ms)
     if len(state.latency_samples) > 1000:

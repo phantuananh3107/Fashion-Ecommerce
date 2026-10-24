@@ -1,8 +1,3 @@
-/**
- * TA shop - Cart Logic (SSR Version)
- * Fix: Validate ngay khi người dùng gõ số, bắt sự kiện phím Enter và gửi API chuẩn xác.
- */
-
 const contextPath = window.location.pathname.includes('/jsp_servlet_war_exploded') ? '/jsp_servlet_war_exploded' : '';
 
 $(document).ready(function() {
@@ -30,9 +25,6 @@ $(document).ready(function() {
         $('#miniCartSidebar, #miniCartOverlay').removeClass('active');
     });
 
-    // ==========================================
-    // TĂNG SỐ LƯỢNG (+)
-    // ==========================================
     $(document).on('click', '.btn-qty-up', function() {
         const pid = $(this).attr('data-product-id');
         const size = $(this).attr('data-product-size');
@@ -47,9 +39,6 @@ $(document).ready(function() {
         }
     });
 
-    // ==========================================
-    // GIẢM SỐ LƯỢNG (-)
-    // ==========================================
     $(document).on('click', '.btn-qty-down', function() {
         const pid = $(this).attr('data-product-id');
         const size = $(this).attr('data-product-size');
@@ -62,9 +51,6 @@ $(document).ready(function() {
         updateCartQuantity(pid, size, 'down');
     });
 
-    // ==========================================
-    // BẮT SỰ KIỆN GÕ PHÍM TRỰC TIẾP (GIÁM SÁT REALTIME)
-    // ==========================================
     $(document).on('input', '.qty-input-manual', function() {
         let val = parseInt($(this).val());
         const maxQty = parseInt($(this).attr('data-product-max')) || 0;
@@ -77,15 +63,13 @@ $(document).ready(function() {
         }
     });
 
-    // THÊM MỚI: Bắt sự kiện ấn phím ENTER (Mã 13) để tương thích trên Chrome
     $(document).on('keypress', '.qty-input-manual', function(e) {
         if (e.which === 13) {
             e.preventDefault();
-            $(this).blur(); // Ép trình duyệt kích hoạt sự kiện 'change' bên dưới
+            $(this).blur();
         }
     });
 
-    // Khi gõ xong (Enter hoặc Click chuột ra ngoài) -> Gửi AJAX lưu xuống Backend
     $(document).on('change', '.qty-input-manual', function() {
         const pid = $(this).attr('data-product-id');
         const size = $(this).attr('data-product-size');
@@ -97,11 +81,9 @@ $(document).ready(function() {
             $(this).val(val);
         }
 
-        // Gọi Backend thông qua hàm dùng chung đã được sửa
         updateCartQuantity(pid, size, 'set', val);
     });
 
-    // XÓA ITEM
     $(document).on('click', '.btn-remove-item', function() {
         if (confirm("Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?")) {
             const pid = $(this).attr('data-product-id');
@@ -111,15 +93,13 @@ $(document).ready(function() {
     });
 });
 
-// ========== AJAX FUNCTIONS ==========
 
-// SỬA QUAN TRỌNG: Thêm tham số qty=0 và truyền quantity vào $.post
 function updateCartQuantity(pid, size, action, qty = 0) {
     $.post(contextPath + '/customer/update-cart', {
         product_id: pid,
         size: size,
         action: action,
-        quantity: qty // Đẩy con số khách hàng vừa gõ xuống Java
+        quantity: qty
     }, function() {
         refreshCartUI(true);
     }).fail(function() {
@@ -176,7 +156,6 @@ function updateCartBadge() {
     $('#cartBadge').text(rowCount);
 }
 
-// ========== TOAST ENGINE ==========
 let toastTimeout;
 function showToast(message, duration = 3000) {
     $('#ivyAppToast').remove();

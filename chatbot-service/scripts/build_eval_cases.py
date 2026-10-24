@@ -1,18 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Sinh data/eval_cases.jsonl — tập câu hỏi mẫu cho JEV (tầng 2).
-
-Nguồn:
-  1. 85 case gốc từ tests/test_intents.py (đã đạt 100% với Rule) → split "train"
-  2. ~180 paraphrase mới mô phỏng cách viết thực tế → 80% "train", 20% "test"
-
-Paraphrase styles:
-  - Không dấu: "tim ao thun den size l"
-  - Teencode: "co ao khoac ko", "ship bn lau"
-  - Câu dài nhiều điều kiện
-  - Lỗi chính tả thiểu, thiếu dấu câu
-  - Ngữ nghĩa gần gũi, đời thường
-"""
 import json
 import random
 from pathlib import Path
@@ -20,9 +5,6 @@ from pathlib import Path
 BASE = Path(__file__).resolve().parent.parent
 OUT = BASE / "data" / "eval_cases.jsonl"
 
-# ---------------------------------------------------------------------------
-# 85 case gốc (trùng với tests/test_intents.py) → train
-# ---------------------------------------------------------------------------
 ORIGINAL = [
     ("tìm áo thun nam màu đen size L", "find_product"),
     ("có váy nào dưới 300k không", "find_product"),
@@ -111,9 +93,6 @@ ORIGINAL = [
     ("á", "unclear"),
 ]
 
-# ---------------------------------------------------------------------------
-# Paraphrase mới — mục tiêu: JEV bắt được những câu Rule hay bỏ sót
-# ---------------------------------------------------------------------------
 PARAPHRASE = {
     "find_product": [
         "mình đi biển cuối tuần mặc gì đẹp",
@@ -145,16 +124,13 @@ PARAPHRASE = {
         "cho tôi xem túi xách",
         "đồ thời trang nữ cao cấp",
         "mua quần vải cho con",
-        # không dấu
         "tim quan ao lot nữ",
         "co ao khoac puach khong",
         "tim ao som mi nam",
         "ao thun trang co khong",
-        # teencode
         "co ao croptop ko",
         "tim set do van phong dep",
         "ao mua dot nuoc roi sao re",
-        # câu dài
         "tôi cần tìm một chiếc áo thun nữ chất liệu cotton màu trắng cho mùa hè",
         "shop có bán quần jean nữ ống rộng không ạ",
     ],
@@ -169,14 +145,11 @@ PARAPHRASE = {
         "quần jean còn size 30 không",
         "shop còn item này không",
         "còn size nào của áo khoác",
-        # không dấu
         "ao thun den con hang ko",
         "size l con khong",
         "con hang chua shop",
-        # teencode
         "con size M ko",
         "hang con ko shop",
-        # câu dài
         "cho tôi hỏi chiếc áo khoác denim này còn hàng không ạ",
     ],
     "price_query": [
@@ -188,13 +161,10 @@ PARAPHRASE = {
         "giá set đồ công sở",
         "áo sơ mi bao nhiêu",
         "tính giá giúp tôi cái váy",
-        # không dấu
         "gia bao nhieu ao hoodie",
         "quan jean gia bao nhieu",
-        # teencode
         "gia ao khoac bn",
         "bao nhieu tien cai day",
-        # câu dài
         "cho tôi biết chiếc áo len mùa đông này giá bao nhiêu ạ",
     ],
     "promotion_query": [
@@ -207,14 +177,11 @@ PARAPHRASE = {
         "khuyến mãi tháng này là gì",
         "mã ưu đãi dùng ở đâu",
         "shop có giảm giá cho khách mới không",
-        # không dấu
         "co ma giam gia khong",
         "shop dang sale gi",
         "voucher con khong",
-        # teencode
         "co freeship ko",
         "khuyen mai gi bay gio",
-        # câu dài
         "cho tôi hỏi shop có mã giảm giá nào đang chạy không ạ",
     ],
     "size_guide": [

@@ -1,12 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Sinh data/centroids.json từ data/eval_cases.jsonl (chỉ dùng split="train").
-
-Centroid = trung bình vector của các câu cùng intent, sau đó L2-normalize.
-Lưu kèm meta (model, dim, số mẫu/intent) để JEVMatcher kiểm tra tương thích.
-
-Chạy:  python scripts/build_centroids.py
-"""
 import json
 import sys
 from collections import defaultdict
@@ -36,7 +28,6 @@ def main() -> None:
     if not cases:
         raise SystemExit("Không có case nào với split=train trong eval_cases.jsonl")
 
-    # Lazy-import để báo lỗi rõ ràng nếu thiếu lib
     try:
         from sentence_transformers import SentenceTransformer
     except ImportError as e:
@@ -47,18 +38,15 @@ def main() -> None:
     print(f"Đang tải model {MODEL_NAME} (lần đầu ~1-2 phút)...")
     model = SentenceTransformer(MODEL_NAME)
 
-    # Gom câu theo intent
     by_intent: dict[str, list[str]] = defaultdict(list)
     for c in cases:
         by_intent[c["intent"]].append(c["text"])
 
-    # Embed theo intent
     centroids: dict[str, list[float]] = {}
     samples: dict[str, list[list[float]]] = {}
     counts: dict[str, int] = {}
     for intent, texts in sorted(by_intent.items()):
         vecs = model.encode([QUERY_PREFIX + t for t in texts], normalize_embeddings=True)
-        # centroid = mean rồi L2-normalize
         import numpy as np
 
         samples[intent] = [[float(x) for x in v] for v in vecs]

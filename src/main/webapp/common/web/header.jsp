@@ -4,7 +4,6 @@
 <%@include file="/common/taglib.jsp"%>
 
 <style>
-  /* Cố định khung chứa để Mega Menu không bị tràn viền */
   .inner-wrap { position: relative; }
   .inner-menu > ul > li.has-mega { position: static; }
 
@@ -16,23 +15,21 @@
     position: absolute;
     top: 100%;
     left: 0;
-    width: 100%; /* Bám chính xác theo chiều rộng của thẻ inner-wrap */
+    width: 100%;
     background: #fff;
-    border: 1px solid #e1e1e1; /* Viền giống Bộ sưu tập */
+    border: 1px solid #e1e1e1;
     border-top: none;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.05); /* Bóng mờ giống Bộ sưu tập */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
     display: none;
     z-index: 9999;
     padding: 30px;
-    margin-top: -2px; /* Xích lên trên 1 chút để nối liền với Header */
+    margin-top: -2px;
   }
 
-  /* CẦU NỐI VÔ HÌNH: Khắc phục lỗi di chuột bị mất menu */
   .mega-content::before {
     content: ""; position: absolute; top: -15px; left: 0; width: 100%; height: 15px; background: transparent;
   }
 
-  /* Tận dụng lại css chữ từ sub-title-menu của Bộ sưu tập */
   .mega-content .sub-title-menu { margin-bottom: 12px; }
   .mega-content .sub-title-menu a {
     font-weight: bold !important; color: #222 !important;
@@ -54,13 +51,11 @@
 
   .mobile-sub-title { font-weight: bold; color: #222; margin-top: 15px; margin-bottom: 5px; font-size: 14px; text-transform: uppercase; display: block; }
 
-  /* 1. Bao quát toàn bộ khối tìm kiếm */
   .search-wrapper {
     position: relative;
-    width: 300px; /* Bạn có thể thay đổi độ rộng tùy giao diện thực tế */
+    width: 300px;
   }
 
-  /* 2. Form chứa Input và Icon */
   .search-form {
     position: relative;
     width: 100%;
@@ -68,19 +63,17 @@
 
   .search-form input {
     width: 100%;
-    padding: 8px 35px 8px 12px; /* Chừa 35px bên phải để không bị chữ đè lên icon */
-    border: 1px solid #e3e5e5;
+    padding: 8px 35px 8px 12px;
     border-radius: 4px;
     outline: none;
     font-size: 13px;
   }
 
-  /* Ép icon kính lúp sát mép phải ô input */
   .search-form button {
     position: absolute;
     top: 50%;
-    right: 10px; /* Cách mép phải 10px */
-    transform: translateY(-50%); /* Căn giữa theo chiều dọc */
+    right: 10px;
+    transform: translateY(-50%);
     background: transparent;
     border: none;
     cursor: pointer;
@@ -88,11 +81,10 @@
     padding: 0;
   }
 
-  /* 3. Bảng gợi ý */
   .search-suggest {
     display: none;
     position: absolute;
-    top: calc(100% + 3px); /* Tách khỏi ô input đúng 3px như yêu cầu */
+    top: calc(100% + 3px);
     left: 0;
     width: 100%;
     background: #fff;
@@ -103,25 +95,22 @@
     border-radius: 4px;
   }
 
-  /* Hiện bảng khi active */
   .search-wrapper.active .search-suggest {
     display: block;
   }
 
-  /* 4. Chữ "Tìm kiếm nhiều nhất" */
   .suggest-header {
     margin-bottom: 12px;
   }
 
   .suggest-header strong {
-    font-size: 11px; /* Chữ thu nhỏ lại */
+    font-size: 11px;
     font-weight: 700;
     color: #333;
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
 
-  /* 5. Các thẻ tag */
   .suggest-tags {
     display: flex;
     flex-wrap: wrap;
@@ -405,10 +394,8 @@
       if (window.clearChatHistoryOnLogout) {
         window.clearChatHistoryOnLogout();
       }
-      // 2. CHỐT CHẶN AN TOÀN TRỰC TIẾP (Bảo hiểm 100%)
-      // Tự tay xóa luôn bộ nhớ phòng khi file JS trên bị lỗi mạng không chạy được
-      sessionStorage.removeItem('chatbot_chat_history'); // Xóa dữ liệu mới
-       localStorage.removeItem('chatbot_chat_history');   // Dọn dẹp nốt dữ liệu cũ của ngày hôm trước (nếu còn kẹt)
+      sessionStorage.removeItem('chatbot_chat_history');
+       localStorage.removeItem('chatbot_chat_history');
       window.location.href = '${pageContext.request.contextPath}/logout';
     }
   }
@@ -416,12 +403,10 @@
   const searchWrapper = document.querySelector('.search-wrapper');
   const searchInput = document.getElementById('searchInput');
 
-  // Khi click vào ô input
   searchInput.addEventListener('focus', () => {
     searchWrapper.classList.add('active');
   });
 
-  // Khi click ra ngoài vùng tìm kiếm
   document.addEventListener('click', (e) => {
     if (!searchWrapper.contains(e.target)) {
       searchWrapper.classList.remove('active');

@@ -1,8 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
-<!-- ChatBot Widget - Floating Chat Window ở góc phải màn hình -->
 <div id="chatbot-widget" class="chatbot-widget">
-    <!-- Header của ChatBot -->
     <div class="chatbot-header">
         <div class="chatbot-title">
             <i class="fas fa-robot"></i> TA shop ChatBot
@@ -12,16 +10,14 @@
         </button>
     </div>
 
-    <!-- Vùng hiển thị tin nhắn -->
     <div id="chatbot-messages" class="chatbot-messages">
         <div class="chatbot-message bot-message">
             <div class="message-bubble">
-                👋 Xin chào! Tôi là ChatBot của TA shop. Hỏi tôi bất cứ điều gì về thời trang, sản phẩm hoặc lời khuyên phối đồ!
+                Xin chào! Tôi là ChatBot của TA shop. Hỏi tôi bất cứ điều gì về thời trang, sản phẩm hoặc lời khuyên phối đồ!
             </div>
         </div>
     </div>
 
-    <!-- Input area - Nhập tin nhắn -->
     <div class="chatbot-input-area">
         <input
             type="text"
@@ -36,15 +32,12 @@
     </div>
 </div>
 
-<!-- Floating Button (Khi ChatBot tắt, nút này xuất hiện) -->
 <button id="chatbot-toggle-btn" class="chatbot-toggle-btn" title="Mở ChatBot">
     <i class="fas fa-comments"></i>
     <span class="chatbot-badge">TA</span>
 </button>
 
-<!-- Style cho ChatBot Widget -->
 <style>
-    /* ChatBot Widget - Container chính */
     .chatbot-widget {
         position: fixed;
         bottom: 100px;
@@ -61,7 +54,6 @@
         animation: slideUp 0.3s ease-in-out;
     }
 
-    /* Khi có class .active, thì hiển thị */
     .chatbot-widget.active {
         display: flex;
     }
@@ -77,7 +69,6 @@
         }
     }
 
-    /* ChatBot Header */
     .chatbot-header {
         display: flex;
         justify-content: space-between;
@@ -111,7 +102,6 @@
         transform: scale(1.2);
     }
 
-    /* Messages Container */
     .chatbot-messages {
         flex: 1;
         padding: 20px;
@@ -143,11 +133,16 @@
         border-radius: 10px;
         max-width: 85%;
         word-wrap: break-word;
+        white-space: pre-wrap;
         line-height: 1.4;
         font-size: 14px;
     }
 
-    /* User Message */
+    .bot-message .message-bubble a {
+        color: #667eea;
+        text-decoration: underline;
+    }
+
     .user-message {
         justify-content: flex-end;
     }
@@ -157,7 +152,6 @@
         color: white;
     }
 
-    /* Bot Message */
     .bot-message {
         justify-content: flex-start;
     }
@@ -169,7 +163,6 @@
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
 
-    /* Loading indicator */
     .message-bubble.loading {
         display: flex;
         align-items: center;
@@ -193,7 +186,6 @@
         40% { transform: translateY(-10px); opacity: 1; }
     }
 
-    /* Input Area */
     .chatbot-input-area {
         display: flex;
         gap: 10px;
@@ -243,7 +235,6 @@
         transform: scale(0.95);
     }
 
-    /* Floating Toggle Button */
     .chatbot-toggle-btn {
         position: fixed;
         bottom: 30px;
@@ -289,17 +280,14 @@
         font-weight: bold;
     }
 
-    /* Hide/Show */
-    /* Khi không có .active, thì ẩn */
     .chatbot-toggle-btn {
-        display: flex;  /* Luôn hiển thị nút toggle */
+        display: flex;
     }
 
     .chatbot-toggle-btn.hidden {
-        display: none;  /* Ẩn nút khi widget mở */
+        display: none;
     }
 
-    /* Responsive Design */
     @media (max-width: 768px) {
         .chatbot-widget {
             width: calc(100% - 40px);
