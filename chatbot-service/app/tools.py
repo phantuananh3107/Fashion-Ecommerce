@@ -177,6 +177,7 @@ def search_products(args: dict[str, Any], query: str = "") -> dict[str, Any]:
             "size": r["product_size"],
             "stock": r["product_quantity"],
             "category": r["category_name"],
+            "product_url": f"/public/trang-chi-san-pham?id={r['id']}&ref=chatbot",
         })
     return {"total": len(rows), "products": items}
 

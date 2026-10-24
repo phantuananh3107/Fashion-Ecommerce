@@ -154,9 +154,15 @@ def _render_tool_reply(tool: str | None, result: dict[str, Any], ask_missing: st
             return "Mình chưa tìm thấy sản phẩm phù hợp. Bạn thử từ khóa khác (ví dụ: áo thun, quần jean, đầm) nhé."
         lines = [f"Mình gợi ý {len(products)} sản phẩm phù hợp:"]
         for p in products:
-            stock_note = "" if (p.get("stock") or 0) > 0 else " (tạm hết hàng)"
-            lines.append(f"• {p['name']} – {p['price_text']} – màu {p.get('color') or 'nhiều màu'}{stock_note}")
-        lines.append("Bạn xem chi tiết và kiểm tra size trước khi đặt nhé!")
+            link = p.get("product_url", "#")
+            name = p.get("name", "Sản phẩm")
+            price_text = p.get("price_text", "")
+            color = p.get("color", "")
+            size = p.get("size", "")
+            stock = p.get("stock", 0)
+            stock_note = "" if stock > 0 else " (tạm hết hàng)"
+            lines.append(f'• <a href="{link}" target="_blank" rel="noopener noreferrer">{name}</a> – {price_text} – màu {color}, size {size}{stock_note}')
+        lines.append("Bạn xem chi tiết và chọn size trước khi đặt nhé!")
         return "\n".join(lines)
 
     if tool == "check_stock":

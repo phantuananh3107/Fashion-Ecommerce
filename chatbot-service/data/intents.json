@@ -34,7 +34,7 @@
       "priority": 1,
       "keywords": ["tìm", "tim", "xem", "có", "muốn mua", "cho xem", "giới thiệu", "áo", "quần", "váy", "đầm", "giày", "túi", "phụ kiện", "set đồ", "đồ", "sản phẩm", "hoodie", "sơ mi", "jean", "short", "crop", "maxi", "len", "khoác", "nam", "nữ", "trẻ em", "mới"],
       "patterns": ["(tim|xem|co|muon mua|cho xem|gioi thieu).*(ao|quan|vay|dam|giay|tui|hoodie|so mi|jean)", "(\\bao|\\bquan\\b|\\bvay\\b|\\bdam\\b|\\bgiay\\b|\\btui\\b|\\bhoodie\\b)"],
-      "entities": ["keyword", "category", "color", "size", "price_range"],
+      "entities": ["keyword", "category", "color", "size", "price_range", "gender"],
       "tool": "search_products",
       "required_entities": [],
       "response_template": null
@@ -164,7 +164,8 @@
     "size": "\\b(XXS|XS|S|M|L|XL|XXL|2XL|3XL|28|29|30|31|32|34|36|38|40|42)\\b",
     "color": "\\b(đỏ|den|đen|trắng|trang|xanh|vàng|vang|hồng|hong|tím|tim|nâu|nau|be|kem|xám|xam)\\b",
     "price_range": "(dưới|duoi|tren|trên|từ|tu).*\\d+[kK]?",
-    "keyword": "(áo thun|áo sơ mi|áo khoác|quần jean|quần short|váy|đầm|hoodie|crop top|maxi|áo len|set đồ|giày|túi)"
+    "keyword": "(áo thun|áo sơ mi|áo khoác|quần jean|quần short|váy|đầm|hoodie|crop top|maxi|áo len|set đồ|giày|túi|áo sơ mi|quần âu|chân váy)\\b",
+    "gender": "\\b(nam|nữ|nam giới|nữ giới)\\b",
   },
   "out_of_scope_keywords": ["thời tiết", "thoi tiet", "tổng thống", "tong thong", "phương trình", "phuong trinh", "viết code", "viet code", "dịch sang", "dich sang", "dịch", "dich", "đá bóng", "da bong", "chứng khoán", "chung khoan", "bầu cử", "bau cu", "chính trị", "chinh tri", "y tế", "y te", "luật", "kể chuyện", "ke chuyen", "chuyện cười", "chuyen cuoi", "truyện cười", "truyen cuoi", "mổ", "bệnh", "benh", "thuốc", "thuoc", "khám", "kham"],
   "teencode_map": {

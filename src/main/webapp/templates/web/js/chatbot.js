@@ -146,9 +146,11 @@ $(document).ready(function () {
     // ===== CÁC HÀM TIỆN ÍCH GIỮ NGUYÊN =====
     function appendMessage(text, sender) {
         const messageClass = sender === 'user' ? 'user-message' : 'bot-message';
+        // Bot message có thể chứa HTML (ví dụ: liên kết gợi ý sản phẩm), user message phải escape để tránh XSS
+        const displayText = sender === 'user' ? escapeHtml(text) : text;
         const messageHTML = `
             <div class="chatbot-message ${messageClass}">
-                <div class="message-bubble">${escapeHtml(text)}</div>
+                <div class="message-bubble">${displayText}</div>
             </div>
         `;
         $messagesContainer.append(messageHTML);
