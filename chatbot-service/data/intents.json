@@ -165,7 +165,7 @@
     "color": "\\b(đỏ|den|đen|trắng|trang|xanh|vàng|vang|hồng|hong|tím|tim|nâu|nau|be|kem|xám|xam)\\b",
     "price_range": "(dưới|duoi|tren|trên|từ|tu).*\\d+[kK]?",
     "keyword": "(áo thun|áo sơ mi|áo khoác|quần jean|quần short|váy|đầm|hoodie|crop top|maxi|áo len|set đồ|giày|túi|áo sơ mi|quần âu|chân váy)\\b",
-    "gender": "\\b(nam|nữ|nam giới|nữ giới)\\b",
+    "gender": "\\b(nam|nữ|nam giới|nữ giới)\\b"
   },
   "out_of_scope_keywords": ["thời tiết", "thoi tiet", "tổng thống", "tong thong", "phương trình", "phuong trinh", "viết code", "viet code", "dịch sang", "dich sang", "dịch", "dich", "đá bóng", "da bong", "chứng khoán", "chung khoan", "bầu cử", "bau cu", "chính trị", "chinh tri", "y tế", "y te", "luật", "kể chuyện", "ke chuyen", "chuyện cười", "chuyen cuoi", "truyện cười", "truyen cuoi", "mổ", "bệnh", "benh", "thuốc", "thuoc", "khám", "kham"],
   "teencode_map": {
