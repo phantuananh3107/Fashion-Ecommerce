@@ -19,7 +19,8 @@ def normalize_text(text: str) -> str:
 
 
 def remove_accents(text: str) -> str:
-    """Bỏ dấu tiếng Việt để match cả không dấu."""    text = text.replace("đ", "d").replace("Đ", "D")
+    """Bỏ dấu tiếng Việt để match cả không dấu."""
+    text = text.replace("đ", "d").replace("Đ", "D")
     nfkd = unicodedata.normalize("NFKD", text)
     return "".join(c for c in nfkd if not unicodedata.combining(c))
 
