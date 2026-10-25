@@ -102,10 +102,12 @@ def search_products(args: dict[str, Any], query: str = "") -> dict[str, Any]:
     category = (args.get("category") or "").strip()
     color = (args.get("color") or "").strip()
     size = (args.get("size") or "").strip()
+    gender = (args.get("gender") or "").strip().lower()
     max_price = args.get("max_price")
 
     where = ["p.isDeleted = 0"]
     params: list[Any] = []
+    extra_joins = ""
 
     if keyword:
         where.append("(p.product_name LIKE %s OR c.category_name LIKE %s OR p.product_description LIKE %s)")
@@ -120,10 +122,17 @@ def search_products(args: dict[str, Any], query: str = "") -> dict[str, Any]:
         where.append("p.product_size LIKE %s")
         params.append(f"%{size}%")
 
+    if gender in ("nam", "nu", "nữ"):
+        root = "NAM" if gender == "nam" else "NỮ"
+        extra_joins += " LEFT JOIN category pc ON c.parent_id = pc.category_id"
+        extra_joins += " LEFT JOIN category ppc ON pc.parent_id = ppc.category_id"
+        where.append("(c.category_name = %s OR pc.category_name = %s OR ppc.category_name = %s)")
+        params += [root, root, root]
+
     sql = (
         "SELECT p.id, p.product_name, p.product_color, p.product_size, "
         "p.product_price, p.discount_percent, p.product_quantity, c.category_name "
-        "FROM product p LEFT JOIN category c ON p.category_id = c.category_id "
+        f"FROM product p LEFT JOIN category c ON p.category_id = c.category_id{extra_joins} "
         f"WHERE {' AND '.join(where)} ORDER BY p.discount_percent DESC, p.product_quantity DESC LIMIT 20"
     )
 

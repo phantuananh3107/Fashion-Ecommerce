@@ -12,9 +12,7 @@
 
     <div id="chatbot-messages" class="chatbot-messages">
         <div class="chatbot-message bot-message">
-            <div class="message-bubble">
-                Xin chào! Tôi là ChatBot của TA shop. Hỏi tôi bất cứ điều gì về thời trang, sản phẩm hoặc lời khuyên phối đồ!
-            </div>
+            <div class="message-bubble">Xin chào! Tôi là ChatBot của TA shop. Hỏi tôi bất cứ điều gì về thời trang, sản phẩm hoặc lời khuyên phối đồ!</div>
         </div>
     </div>
 
