@@ -27,4 +27,12 @@ public class OrderObject {
     private Integer voucherId;
     private UserObject userObject;
     private List<OrderDetailObject> orderDetailList;
+
+    // ── SePay fields ────────────────────────────────────────────────────────
+    /** Mã dùng trong nội dung chuyển khoản, dạng DH + orderId */
+    private String paymentCode;
+    /** Thời điểm thanh toán xác nhận thành công */
+    private Date paidAt;
+    /** Thời điểm QR hết hạn */
+    private Date expiresAt;
 }

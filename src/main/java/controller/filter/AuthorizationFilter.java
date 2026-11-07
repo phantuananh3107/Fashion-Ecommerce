@@ -43,6 +43,11 @@ public class AuthorizationFilter implements Filter {
             chain.doFilter(request, response);
             return;
         }
+        // API endpoints — tự xác thực bằng header, không cần session
+        if (uri.startsWith(contextPath + "/api/")) {
+            chain.doFilter(request, response);
+            return;
+        }
         // Phân quyền dựa trên vai trò và URL
         if (uri.startsWith(contextPath + "/public/") ) {
             chain.doFilter(request, response);

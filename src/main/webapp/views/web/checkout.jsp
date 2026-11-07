@@ -3,6 +3,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <div class="checkout-page-wrapper container py-5">
+    <c:if test="${param.error == 'sepay_config_missing'}">
+        <div class="alert alert-danger" role="alert">
+            Thanh toán QR đang thiếu cấu hình tài khoản nhận tiền. Vui lòng chọn COD hoặc liên hệ quản trị viên.
+        </div>
+    </c:if>
     <form action="${pageContext.request.contextPath}/customer/process-checkout" method="POST">
         <div class="row">
             <div class="col-lg-7 pe-lg-5">
@@ -59,12 +64,8 @@
                             <span class="payment-name">Thanh toán khi nhận hàng (COD)</span>
                         </label>
                         <label class="payment-method-item">
-                            <input type="radio" name="paymentMethod" value="VNPAY">
-                            <span class="payment-name">Thanh toán qua VNPAY / Thẻ ATM</span>
-                        </label>
-                        <label class="payment-method-item">
-                            <input type="radio" name="paymentMethod" value="MOMO">
-                            <span class="payment-name">Thanh toán qua Ví MoMo</span>
+                            <input type="radio" name="paymentMethod" value="SEPAY" id="pm-sepay">
+                            <span class="payment-name">Chuyển khoản QR (SePay) — quét mã, tự động xác nhận</span>
                         </label>
                     </div>
                 </div>
@@ -129,4 +130,3 @@
         </div>
     </form>
 </div>
-

@@ -10,6 +10,13 @@
     .product-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
     .other-products-tag { font-size: 0.85rem; color: #888; font-weight: normal; font-style: italic; }
     .order-meta { font-size: 0.85rem; color: #666; }
+    .pay-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:0.75rem; font-weight:600; }
+    .pay-unpaid    { background:#fff3cd; color:#856404; }
+    .pay-waiting   { background:#cfe2ff; color:#084298; }
+    .pay-paid      { background:#d1e7dd; color:#0a3622; }
+    .pay-expired   { background:#f8d7da; color:#842029; }
+    .pay-late      { background:#ff6b00; color:#fff; animation: blink-late 1.2s step-start infinite; }
+    @keyframes blink-late { 0%,100%{opacity:1} 50%{opacity:.6} }
 </style>
 
 <div class="container py-5">
@@ -64,7 +71,27 @@
                     <div class="fw-bold text-danger h5 mb-0">
                         <fmt:formatNumber value="${order.totalAmount}" pattern="###,###"/>đ
                     </div>
-                    <small class="text-muted d-block mt-1">${order.paymentStatus}</small>
+                    <%-- Badge màu theo paymentStatus --%>
+                    <c:choose>
+                        <c:when test="${order.paymentStatus == 'Chưa thanh toán'}">
+                            <span class="pay-badge pay-unpaid d-block mt-1">Chưa thanh toán</span>
+                        </c:when>
+                        <c:when test="${order.paymentStatus == 'Chờ thanh toán online'}">
+                            <span class="pay-badge pay-waiting d-block mt-1">Chờ thanh toán</span>
+                        </c:when>
+                        <c:when test="${order.paymentStatus == 'Đã thanh toán (SePay)'}">
+                            <span class="pay-badge pay-paid d-block mt-1">✓ Đã thanh toán</span>
+                        </c:when>
+                        <c:when test="${order.paymentStatus == 'Hết hạn (SePay)'}">
+                            <span class="pay-badge pay-expired d-block mt-1">Hết hạn QR</span>
+                        </c:when>
+                        <c:when test="${order.paymentStatus == 'Đã thanh toán sau hạn - cần kiểm tra'}">
+                            <span class="pay-badge pay-late d-block mt-1">⚠ Thanh toán sau hạn</span>
+                        </c:when>
+                        <c:otherwise>
+                            <small class="text-muted d-block mt-1">${order.paymentStatus}</small>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
             </div>
 

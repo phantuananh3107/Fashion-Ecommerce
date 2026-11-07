@@ -9,6 +9,7 @@ import java.util.List;
 import dao.OrderDAO;
 import model.*;
 import util.DBUtil;
+import util.OrderStatus;
 
 
 import dao.UserDAO;
@@ -284,6 +285,7 @@ public class OrderDAOImpl implements OrderDAO {
                         detail.setProductColor(rs.getString("product_color"));
 
                         ProductObject p = new ProductObject();
+                        p.setProductId(rs.getInt("product_id"));
                         p.setProductName(rs.getString("product_name"));
                         p.setProductImage(rs.getString("product_image"));
                         detail.setProductObject(p);
@@ -358,7 +360,7 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
 
-    // HÀM TẠO ĐƠN HÀNG (Dùng cho cả COD và VNPAY)
+    // HÀM TẠO ĐƠN HÀNG (Dùng cho cả COD và SePay QR)
     // ==========================================
     // HÀM TẠO ĐƠN HÀNG VÀ TRỪ SỐ LƯỢNG TỒN KHO CÙNG LÚC
     // ==========================================
@@ -475,5 +477,276 @@ public class OrderDAOImpl implements OrderDAO {
             }
         }
         return generatedOrderId;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // PHƯƠNG THỨC SEPAY
+    // ═══════════════════════════════════════════════════════════════════════
+
+    @Override
+    public boolean updateSePayFields(int orderId, String paymentCode, java.sql.Timestamp expiresAt) {
+        String sql = "UPDATE `Order` SET payment_code = ?, expires_at = ? WHERE order_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, paymentCode);
+            ps.setTimestamp(2, expiresAt);
+            ps.setInt(3, orderId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public OrderObject findByPaymentCode(String paymentCode) {
+        String sql = "SELECT order_id, user_id, total_amount, order_status, payment_status, " +
+                     "payment_method, payment_code, paid_at, expires_at " +
+                     "FROM `Order` WHERE UPPER(payment_code) = UPPER(?)";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, paymentCode);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    OrderObject o = new OrderObject();
+                    o.setOrderId(rs.getInt("order_id"));
+                    o.setUserId(rs.getInt("user_id"));
+                    o.setTotalAmount(rs.getDouble("total_amount"));
+                    o.setOrderStatus(rs.getString("order_status"));
+                    o.setPaymentStatus(rs.getString("payment_status"));
+                    o.setPaymentMethod(rs.getString("payment_method"));
+                    o.setPaymentCode(rs.getString("payment_code"));
+                    o.setPaidAt(rs.getTimestamp("paid_at"));
+                    o.setExpiresAt(rs.getTimestamp("expires_at"));
+                    return o;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public OrderObject findByOrderIdAndUserId(int orderId, int userId) {
+        String sql = "SELECT order_id, user_id, total_amount, order_status, payment_status, " +
+                     "payment_method, payment_code, paid_at, expires_at " +
+                     "FROM `Order` WHERE order_id = ? AND user_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            ps.setInt(2, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    OrderObject o = new OrderObject();
+                    o.setOrderId(rs.getInt("order_id"));
+                    o.setUserId(rs.getInt("user_id"));
+                    o.setTotalAmount(rs.getDouble("total_amount"));
+                    o.setOrderStatus(rs.getString("order_status"));
+                    o.setPaymentStatus(rs.getString("payment_status"));
+                    o.setPaymentMethod(rs.getString("payment_method"));
+                    o.setPaymentCode(rs.getString("payment_code"));
+                    o.setPaidAt(rs.getTimestamp("paid_at"));
+                    o.setExpiresAt(rs.getTimestamp("expires_at"));
+                    return o;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public int markPaidConditional(int orderId, String paidStatus, java.sql.Timestamp paidAt) {
+        String sql = "UPDATE `Order` SET payment_status = ?, order_status = 'Đã xác nhận', paid_at = ? " +
+                     "WHERE order_id = ? AND payment_status = 'Chờ thanh toán online'";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, paidStatus);
+            ps.setTimestamp(2, paidAt);
+            ps.setInt(3, orderId);
+            return ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean markLatePayment(int orderId, String lateStatus) {
+        String sql = "UPDATE `Order` SET payment_status = ? WHERE order_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, lateStatus);
+            ps.setInt(2, orderId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public int cancelAndRestoreStock(int orderId, String cancelledPayStatus, String cancelledOrderStatus) {
+        Connection conn = null;
+        try {
+            conn = DBUtil.getConnection();
+            conn.setAutoCommit(false);
+
+            // UPDATE có điều kiện — chỉ xử lý khi vẫn đang "Chờ thanh toán online"
+            String sqlUpdate = "UPDATE `Order` SET payment_status = ?, order_status = ? " +
+                               "WHERE order_id = ? AND payment_status = 'Chờ thanh toán online'";
+            int rows;
+            try (PreparedStatement ps = conn.prepareStatement(sqlUpdate)) {
+                ps.setString(1, cancelledPayStatus);
+                ps.setString(2, cancelledOrderStatus);
+                ps.setInt(3, orderId);
+                rows = ps.executeUpdate();
+            }
+
+            if (rows == 1) {
+                // Hoàn kho
+                String sqlRestore = "UPDATE OrderDetail od " +
+                                    "JOIN Product p ON od.product_id = p.id " +
+                                    "SET p.product_quantity = p.product_quantity + od.quantity_sold " +
+                                    "WHERE od.order_id = ?";
+                try (PreparedStatement ps = conn.prepareStatement(sqlRestore)) {
+                    ps.setInt(1, orderId);
+                    ps.executeUpdate();
+                }
+                conn.commit();
+            } else {
+                conn.rollback();
+            }
+            return rows;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            try { if (conn != null) conn.rollback(); } catch (SQLException ignored) {}
+            return 0;
+        } finally {
+            try {
+                if (conn != null) { conn.setAutoCommit(true); conn.close(); }
+            } catch (SQLException ignored) {}
+        }
+    }
+
+    @Override
+    public boolean insertPaymentTransaction(int orderId, String sepayTransactionId,
+                                             double amount, String content, String rawPayload)
+            throws SQLException {
+        String sql = "INSERT INTO payment_transaction " +
+                     "(sepay_transaction_id, order_id, amount, content, raw_payload, created_at) " +
+                     "VALUES (?, ?, ?, ?, ?, NOW())";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, sepayTransactionId);
+            ps.setInt(2, orderId);
+            ps.setDouble(3, amount);
+            ps.setString(4, content);
+            ps.setString(5, rawPayload);
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            if (e.getMessage() != null && e.getMessage().contains("Duplicate")) {
+                return false;
+            }
+            throw e;
+        }
+    }
+
+    @Override
+    public PaymentTransactionResult processPaymentTransaction(
+            OrderObject order, String sepayTransactionId, double amount,
+            String content, String rawPayload, java.sql.Timestamp paidAt,
+            String paidStatus, String lateStatus)
+            throws SQLException {
+        String insertTransactionSql = "INSERT INTO payment_transaction " +
+                "(sepay_transaction_id, order_id, amount, content, raw_payload, created_at) " +
+                "VALUES (?, ?, ?, ?, ?, NOW())";
+        Connection conn = null;
+        try {
+            conn = DBUtil.getConnection();
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement ps = conn.prepareStatement(insertTransactionSql)) {
+                ps.setString(1, sepayTransactionId);
+                ps.setInt(2, order.getOrderId());
+                ps.setDouble(3, amount);
+                ps.setString(4, content);
+                ps.setString(5, rawPayload);
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                if (e.getMessage() != null && e.getMessage().contains("Duplicate")) {
+                    conn.rollback();
+                    return PaymentTransactionResult.DUPLICATE;
+                }
+                throw e;
+            }
+
+            if (OrderStatus.PAY_EXPIRED_SEPAY.equals(order.getPaymentStatus())) {
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "UPDATE `Order` SET payment_status = ? WHERE order_id = ?")) {
+                    ps.setString(1, lateStatus);
+                    ps.setInt(2, order.getOrderId());
+                    ps.executeUpdate();
+                }
+            } else {
+                int rows;
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "UPDATE `Order` SET payment_status = ?, order_status = 'Đã xác nhận', paid_at = ? " +
+                                "WHERE order_id = ? AND payment_status = 'Chờ thanh toán online'")) {
+                    ps.setString(1, paidStatus);
+                    ps.setTimestamp(2, paidAt);
+                    ps.setInt(3, order.getOrderId());
+                    rows = ps.executeUpdate();
+                }
+
+                boolean purchaseLogRequired =
+                        rows == 1 && order.getUserId() != null && order.getUserId() > 0;
+                conn.commit();
+                return purchaseLogRequired
+                        ? PaymentTransactionResult.PROCESSED_WITH_PURCHASE_LOG
+                        : PaymentTransactionResult.PROCESSED;
+            }
+
+            conn.commit();
+            return PaymentTransactionResult.PROCESSED;
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackError) {
+                    e.addSuppressed(rollbackError);
+                }
+            }
+            throw e;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                } finally {
+                    conn.close();
+                }
+            }
+        }
+    }
+
+    @Override
+    public List<Integer> findExpiredSepayOrderIds() {
+        List<Integer> ids = new ArrayList<>();
+        String sql = "SELECT order_id FROM `Order` " +
+                     "WHERE payment_method = 'SEPAY' AND payment_status = 'Chờ thanh toán online' " +
+                     "AND expires_at < NOW()";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                ids.add(rs.getInt("order_id"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ids;
     }
 }
