@@ -9,6 +9,7 @@ from typing import Any
 _ENV_CANDIDATES = [
     Path(__file__).resolve().parent.parent / ".env",            # chatbot-service/.env
     Path(__file__).resolve().parent.parent.parent / ".env",     # Fashion-Ecommerce/.env
+    Path(__file__).resolve().parent.parent.parent.parent / ".env",  # DATN/.env (dev trên máy này)
 ]
 
 

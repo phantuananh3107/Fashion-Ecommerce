@@ -26,6 +26,16 @@
         </nav>
     </div>
 </div>
+<c:if test="${not empty imageSearchError}">
+    <div style="max-width: 1200px; margin: 10px auto; padding: 10px 14px; border: 1px solid #f1c0c0; background: #fdf0f0; color: #a94442; font-size: 13px; border-radius: 4px;">
+        ${imageSearchError}
+    </div>
+</c:if>
+<c:if test="${empty imageSearchError and not empty imageSearchFileName}">
+    <div style="max-width: 1200px; margin: 10px auto; padding: 10px 14px; border: 1px solid #dfe3e5; background: #f7f9fa; color: #3e3f41; font-size: 13px; border-radius: 4px;">
+        Kết quả tìm kiếm cho ảnh: <strong>${imageSearchFileName}</strong> — hiển thị <strong>${imageSearchTotal}</strong> sản phẩm tương đồng nhất.
+    </div>
+</c:if>
 <div class="section-4">
     <div class="container">
         <div class="inner-wrap">

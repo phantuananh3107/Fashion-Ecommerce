@@ -131,6 +131,34 @@
     border-color: #222;
     color: #222;
   }
+
+  .suggest-image-search {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed #e3e5e5;
+  }
+
+  .image-search-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 12px;
+    background: #fff;
+    border: 1px dashed #c9cbcc;
+    border-radius: 2px;
+    font-size: 12px;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .image-search-btn:hover {
+    border-color: #222;
+    color: #222;
+    border-style: solid;
+  }
 </style>
 
 <header class="header">
@@ -327,6 +355,18 @@
               <a href="${pageContext.request.contextPath}/public/search?keyword=Áo khoác">Áo khoác</a>
               <a href="${pageContext.request.contextPath}/public/search?keyword=Đầm dạ hội">Đầm dạ hội</a>
             </div>
+
+            <%-- Tìm kiếm bằng hình ảnh: mở file picker, gửi 1 file ảnh sang /public/image-search --%>
+            <div class="suggest-image-search">
+              <button type="button" class="image-search-btn" id="imageSearchBtn">
+                <i class="fa-solid fa-camera"></i> Tìm kiếm bằng hình ảnh
+              </button>
+              <form id="imageSearchForm"
+                    action="${pageContext.request.contextPath}/public/image-search"
+                    method="POST" enctype="multipart/form-data" style="display:none;">
+                <input type="file" name="image" id="imageSearchInput" accept="image/*">
+              </form>
+            </div>
           </div>
         </div>
         <div class="inner-actions">
@@ -412,6 +452,36 @@
       searchWrapper.classList.remove('active');
     }
   });
+
+  // Tìm kiếm bằng hình ảnh: click → mở hộp chọn file; chọn 1 ảnh → gửi servlet tìm kiếm
+  const imageSearchBtn = document.getElementById('imageSearchBtn');
+  const imageSearchInput = document.getElementById('imageSearchInput');
+  const imageSearchForm = document.getElementById('imageSearchForm');
+  const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+
+  if (imageSearchBtn && imageSearchInput && imageSearchForm) {
+    imageSearchBtn.addEventListener('click', () => {
+      imageSearchInput.click();
+    });
+
+    imageSearchInput.addEventListener('change', () => {
+      const file = imageSearchInput.files && imageSearchInput.files[0];
+      if (!file) return;
+
+      if (!file.type || !file.type.startsWith('image/')) {
+        alert('Vui lòng chọn 1 tệp hình ảnh (JPG, PNG, WEBP…).');
+        imageSearchInput.value = '';
+        return;
+      }
+      if (file.size > MAX_IMAGE_BYTES) {
+        alert('Ảnh quá lớn. Vui lòng chọn ảnh dưới 8MB.');
+        imageSearchInput.value = '';
+        return;
+      }
+
+      imageSearchForm.submit();
+    });
+  }
 </script>
 
 <%@ include file="/common/web/chatbot.jsp" %>

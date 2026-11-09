@@ -2,6 +2,9 @@ fastapi>=0.110
 uvicorn[standard]>=0.29
 pydantic>=2.6
 pymysql>=1.1
+# --- Tìm kiếm bằng hình ảnh (CV phase 1) ---
+opencv-python-headless>=4.10
+python-multipart>=0.0.9
 # --- Tầng 2 JEV (tùy chọn; thiếu thì router tự fallback Tầng 3) ---
 sentence-transformers>=4.0
 torch>=2.2

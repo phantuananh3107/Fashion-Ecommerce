@@ -2,19 +2,34 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import time
 from collections import Counter
 from contextlib import asynccontextmanager
 from typing import Any
 
+# Windows console mặc định cp1252 → print tiếng Việt bị lỗi UnicodeEncodeError.
+# Reconfigure sang UTF-8 (thay bằng thay thế an toàn nếu stream không hỗ trợ).
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:  # noqa: BLE001
+        pass
+
 os.environ.setdefault("HF_HOME", r"D:\models\huggingface")
 os.environ.setdefault("TRANSFORMERS_CACHE", r"D:\models\huggingface")
 os.environ.setdefault("HUGGINGFACE_HUB_CACHE", r"D:\models\huggingface")
 
-from fastapi import FastAPI, HTTPException  # noqa: E402
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile  # noqa: E402
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 from pydantic import BaseModel, Field  # noqa: E402
 
+from app.image_search import (  # noqa: E402
+    MAX_UPLOAD_BYTES,
+    ImageSearchError,
+    build_index as build_image_index,
+    search as image_search_query,
+)
 from app.intent_matcher import IntentMatcher  # noqa: E402
 from app.jev_service import JEVMatcher, JEVNotAvailableError  # noqa: E402
 from app.llm_client import (  # noqa: E402
@@ -38,6 +53,7 @@ class AppState:
         self.router: HybridRouter | None = None
         self.llm: OllamaClient | None = None
         self.llm_ok: bool = False
+        self.image_ok: bool = False
         self.route_counts: Counter = Counter()
         self.latency_samples: list[float] = []
 
@@ -69,6 +85,15 @@ async def lifespan(_: FastAPI):
         print(f"[startup] LLM: {'OK' if state.llm_ok else 'OFF'} ({OLLAMA_MODEL})")
     else:
         print("[startup] LLM: DISABLED (ENABLE_LLM=0)")
+
+    # Tải index ảnh sản phẩm (CV phase 1) — không bắt buộc service khởi động được
+    try:
+        meta = build_image_index()
+        state.image_ok = True
+        print(f"[startup] Image index: OK ({meta['n_products']} sản phẩm, {meta['ms']}ms)")
+    except Exception as e:  # noqa: BLE001
+        state.image_ok = False
+        print(f"[startup] Image index: KHÔNG KHẢ DỤNG ({e}) — /api/image-search sẽ trả 503")
 
     yield
 
@@ -249,6 +274,56 @@ async def chat(req: ChatRequest) -> ChatResponse:
     )
 
 
+class ImageMatch(BaseModel):
+    product_id: int
+    score: float
+
+
+class ImageSearchResponse(BaseModel):
+    matches: list[ImageMatch]
+    total: int
+    top1_score: float | None = None
+    latency_ms: float
+    provider: str = "cv"
+
+
+@app.post("/api/image-search", response_model=ImageSearchResponse)
+async def image_search(file: UploadFile = File(...), top_k: int = Form(10)) -> ImageSearchResponse:
+    """Tìm sản phẩm tương đồng với ảnh upload (CV truyền thống, top-k mặc định 10)."""
+    if not state.image_ok:
+        raise HTTPException(503, "Image search chưa sẵn sàng (index chưa build được)")
+
+    content_type = (file.content_type or "").lower()
+    # Không gate cứng theo content-type: curl/tools hay gửi octet-stream cho .webp.
+    # Tính đúng đắn do image_search tự decode — file không phải ảnh sẽ bị 400.
+    if content_type and content_type.startswith(("video/", "audio/")):
+        raise HTTPException(415, "Chỉ chấp nhận file ảnh (jpg/png/webp)")
+
+    data = await file.read()
+    if not data:
+        raise HTTPException(400, "File ảnh rỗng")
+    if len(data) > MAX_UPLOAD_BYTES:
+        raise HTTPException(413, "Ảnh quá lớn (tối đa 8MB)")
+
+    top_k = max(1, min(int(top_k), 50))
+    t0 = time.perf_counter()
+    try:
+        matches = image_search_query(data, top_k=top_k)
+    except ImageSearchError as e:
+        raise HTTPException(400, str(e))
+    except Exception as e:  # noqa: BLE001
+        print(f"[image-search] error: {e}")
+        raise HTTPException(503, "Image search gặp trục trặc, thử lại sau")
+
+    elapsed = round((time.perf_counter() - t0) * 1000, 1)
+    return ImageSearchResponse(
+        matches=[ImageMatch(**m) for m in matches],
+        total=len(matches),
+        top1_score=matches[0]["score"] if matches else None,
+        latency_ms=elapsed,
+    )
+
+
 @app.get("/health")
 async def health() -> dict[str, Any]:
     return {
@@ -256,6 +331,7 @@ async def health() -> dict[str, Any]:
         "rule": state.rule is not None,
         "jev": state.jev is not None and state.jev.loaded,
         "llm": state.llm_ok,
+        "image": state.image_ok,
         "model": OLLAMA_MODEL,
     }
 
